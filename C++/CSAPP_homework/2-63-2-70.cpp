@@ -37,7 +37,7 @@ int any_odd_one(unsigned x) {
 //Return 1 when x contains an odd number of 1s; 0 otherwise
 // 当x包含奇数个1时返回1；否则返回0
 int odd_ones(unsigned x) {
-        x ^= x >> 16;  // 高16位与低16位异或
+    x ^= x >> 16;  // 高16位与低16位异或
     x ^= x >> 8;   // 前8位与后8位异或
     x ^= x >> 4;   // 前4位与后4位异或
     x ^= x >> 2;   // 前2位与后2位异或

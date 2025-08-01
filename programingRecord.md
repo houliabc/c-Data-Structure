@@ -1,5 +1,9 @@
 
 
+> 本文档用来记录我根据[代码随想录](https://www.programmercarl.com/)来学习c++算法的过程
+>
+> 为了节省空间和篇幅，不会将每个题的代码粘贴出来，就简单写一下方法思路，其中某些好用的模板会写出来，如滑动窗口、双指针等
+
 # 洛谷说明
 
 各个评测状态
@@ -26,7 +30,9 @@
 
 ## 5月
 
-### [76\. 最小覆盖子串](https://leetcode.cn/problems/minimum-window-substring/)
+> 本月主要学习数组，一开始是没打算记录的，后面才想到去做，所以这个月很少记录（主要懒得去翻以前的记录了）
+
+[76\. 最小覆盖子串](https://leetcode.cn/problems/minimum-window-substring/)
 
 ```cpp
 // 滑动窗口算法伪码框架
@@ -67,17 +73,17 @@ void slidingWindow(string s) {
 }
 ```
 
-### [567. 字符串的排列](https://leetcode.cn/problems/permutation-in-string/)
+[567. 字符串的排列](https://leetcode.cn/problems/permutation-in-string/)
 
 滑动窗口还可以固定大小的方式，就适用于这种子串、子排列相同长度的情况下
 
-### [46. Permutations](https://leetcode.cn/problems/permutations/)
+[46. Permutations](https://leetcode.cn/problems/permutations/)
 
 基本抄了官方的解了，第一次做仅能想到每一次要不断通过递归，确定一个元素，才能实现所有的情况可能，但是没想出具体如何实现递归，直接看了题解了
 
 回溯算法的框架：
 
-```
+```cpp
 result = []
 def backtrack(路径, 选择列表):
     if 满足结束条件:
@@ -94,21 +100,142 @@ def backtrack(路径, 选择列表):
 
 ## 6月
 
+> 记录本人6月份力扣的刷题记录，前面的序号表示是几号，如1就是6月1号
+>
+> 本月学完了数组、链表、哈希表和字符串
+
 1. [167. Two Sum II - Input Array Is Sorted](https://leetcode.cn/problems/two-sum-ii-input-array-is-sorted/)
 
    滑动窗口：直接左右指针的方式，当和大于target时，让右指针左移，也就是和会减小；而当和小于target时，让左指针右移，这样和就会增大
+
+   ```cpp
+   class Solution {
+   public:
+       vector<int> twoSum(vector<int>& numbers, int target) {
+           int n = numbers.size(), left = 0, right = n - 1;
+           while (left < right) {
+               if (numbers[left] + numbers[right] > target)
+                   right--;
+               else if (numbers[left] + numbers[right] < target)
+                   left++;
+               else
+                   break;
+           }
+           return vector<int> {left + 1, right + 1};
+       }
+   };
+   ```
+
+   ### 链表
 
 2. [203. Remove Linked List Elements](https://leetcode.cn/problems/remove-linked-list-elements/)
 
    - 方法一：正常的前后指针解法
 
+     ```cpp
+     /**
+      * Definition for singly-linked list.
+      * struct ListNode {
+      *     int val;
+      *     ListNode *next;
+      *     ListNode() : val(0), next(nullptr) {}
+      *     ListNode(int x) : val(x), next(nullptr) {}
+      *     ListNode(int x, ListNode *next) : val(x), next(next) {}
+      * };
+      */
+     class Solution {
+     public:
+         ListNode* removeElements(ListNode* head, int val) {
+             while (head && head->val == val) {
+                 ListNode *temp = head;
+                 head = head->next;
+                 delete(temp);
+             }
+             ListNode *pre = head, *now;
+             while (pre && pre->next) {
+                 now = pre->next;
+                 if (now->val == val) {
+                     pre->next = now->next;
+                     delete(now);
+                 }
+                 else
+                     pre = pre->next;
+             }
+             return head;
+         }
+     };
+     ```
+
    - 方法二：设置一个虚拟头结点在进行移除节点操作
+
+     ```cpp
+     /**
+      * Definition for singly-linked list.
+      * struct ListNode {
+      *     int val;
+      *     ListNode *next;
+      *     ListNode() : val(0), next(nullptr) {}
+      *     ListNode(int x) : val(x), next(nullptr) {}
+      *     ListNode(int x, ListNode *next) : val(x), next(next) {}
+      * };
+      */
+     class Solution {
+     public:
+         ListNode* removeElements(ListNode* head, int val) {
+             ListNode *vitual = new ListNode(0), *cur, *pro;  // 注意对节点初始化时，就需要用new
+             vitual->next = head;
+             cur = vitual;
+             while (cur->next) {
+                 pro = cur->next;
+                 if (pro->val == val) {
+                     cur->next = pro->next;
+                     delete(pro);
+                 }
+                 else
+                     cur = pro;
+             }
+             head = vitual->next;
+             delete(vitual);  // 该虚拟节点也应该释放掉
+             return head;
+         }
+     };
 
    - 方法三：通过递归的思路解决本题:
 
      基础情况：对于空链表，不需要移除元素。
 
      递归情况：首先检查头节点的值是否为 val，如果是则移除头节点，答案即为在头节点的后续节点上递归的结果；如果头节点的值不为 val，则答案为头节点与在头节点的后续节点上递归得到的新链表拼接的结果。
+
+     ```cpp
+     /**
+      * Definition for singly-linked list.
+      * struct ListNode {
+      *     int val;
+      *     ListNode *next;
+      *     ListNode() : val(0), next(nullptr) {}
+      *     ListNode(int x) : val(x), next(nullptr) {}
+      *     ListNode(int x, ListNode *next) : val(x), next(next) {}
+      * };
+      */
+     class Solution {
+     public:
+         ListNode* removeElements(ListNode* head, int val) {
+             // 也可以通过递归的思路解决本题:
+             // 基础情况：对于空链表，不需要移除元素。
+             // 递归情况：首先检查头节点的值是否为 val，如果是则移除头节点，答案即为在头节点的后续节点上递归的结果；如果头节点的值不为 val，则答案为头节点与在头节点的后续节点上递归得到的新链表拼接的结果。
+             if (!head)  // 空链表
+                 return nullptr;
+             if (head->val == val) {
+                 ListNode *newHead = removeElements(head->next, val);
+                 delete head;
+                 return newHead;
+             }
+             else {
+                 head->next = removeElements(head->next, val);
+                 return head;
+             }
+         }
+     };
 
 3. 无
 
@@ -126,7 +253,241 @@ def backtrack(路径, 选择列表):
 5. [92. Reverse Linked List II](https://leetcode.cn/problems/reverse-linked-list-ii/)
 
    - 方法一：将left的前一个元素作为虚拟头结点，只不过要保存left的节点，之后对区域内去逆序，最后将保存的left节点指向right后的节点即可
+
+     ```cpp
+     class MyLinkedList {
+     public:
+         struct ListNode {
+             int val;
+             ListNode *next;
+             ListNode(int val):val(val), next(nullptr) {};
+         };
+     
+     private:
+         ListNode *_dummyHead;
+         int _size = 0;    
+     
+     public:
+         MyLinkedList() {
+             _dummyHead = new ListNode(0);
+             _size = 0;
+         }
+         
+         int get(int index) {
+             // 先判断索引是否越界
+             if (index < 0 || index >= _size)
+                 return -1;
+             ListNode *cur = _dummyHead->next;  // 定位到第一个元素
+             while (index-- > 0) {
+                 cur = cur->next;
+             }
+             return cur->val;
+         }
+         
+         void addAtHead(int val) {
+             ListNode *newNode = new ListNode(val);
+             newNode->next = _dummyHead->next;
+             _dummyHead->next = newNode;
+             _size++;
+         }
+         
+         void addAtTail(int val) {
+             ListNode *newNode = new ListNode(val), *cur = _dummyHead;  // 定位到第一个元素
+             while (cur->next) {
+                 cur = cur->next;
+             }
+             cur->next = newNode;
+             _size++;
+         }
+         
+         void addAtIndex(int index, int val) {
+             // 判断越界情况，这里只有当index超出链表长度时，才不插入，否则即使小于0也会插入（根据题目规定的）
+             if (index > _size)
+                 return;
+             if (index < 0)
+                 index = 0; // 表示小于0时，插入到第一个位置
+             ListNode *newNode = new ListNode(val), *cur = _dummyHead->next, *pre = _dummyHead;  // 定位到第一个元素
+             while (index--) {
+                 pre = cur;   // 这里我写复杂了，一般情况下，cur = _dummyHead即可，也不需要pre，因为本身有虚拟节点就是省去前后指针操作的
+                 cur = cur->next;
+             }
+             newNode->next = cur;
+             pre->next = newNode;
+             _size++;
+         }
+         
+         void deleteAtIndex(int index) {
+             // 判断越界情况
+             if (index < 0 || index >= _size || _size == 0)
+                 return;
+             ListNode *cur = _dummyHead->next, *pre = _dummyHead;  // 定位到第一个元素
+             while (index--) {
+                 pre = cur;
+                 cur = cur->next;
+             }
+             if (cur->next == nullptr)
+                 pre->next = nullptr;
+             else
+                 pre->next = cur->next;
+             delete(cur);
+             //如果不再加上一句cur=nullptr,cur会成为乱指的野指针
+             //如果之后的程序不小心使用了cur，会指向难以预想的内存空间
+             cur = nullptr;
+             _size--;
+         }
+     
+         // 打印链表
+         void printLinkedList() {
+             ListNode *cur = _dummyHead->next;
+             while (cur) {
+                 cout << cur->val << ',';
+                 cur = cur->next;
+             }
+         }
+     };
+     
+     /**
+      * Your MyLinkedList object will be instantiated and called as such:
+      * MyLinkedList* obj = new MyLinkedList();
+      * int param_1 = obj->get(index);
+      * obj->addAtHead(val);
+      * obj->addAtTail(val);
+      * obj->addAtIndex(index,val);
+      * obj->deleteAtIndex(index);
+      */
+
    - **方法二：完全抄的递归版本（有点挑战性，自己暂时想不出）**
+
+     ```cpp
+     // 双链表节点的定义
+     typedef struct DoubleListNode {
+         int val;
+         struct DoubleListNode *next;
+         struct DoubleListNode *prev;
+     }DoubleListNode;
+     
+     // 双链表的定义：有size大小
+     typedef struct {
+         int size;
+         // 双链表由多个双链表节点所组成
+         DoubleListNode *data;
+     } MyLinkedList;
+     
+     MyLinkedList* myLinkedListCreate() {
+         MyLinkedList *obj = (MyLinkedList *)malloc(sizeof(MyLinkedList));
+         DoubleListNode *head = (DoubleListNode *)malloc(sizeof(DoubleListNode));
+         head->val = 0;
+         head->next = NULL; head->prev = NULL;
+         obj->data = head;
+         obj->size = 0;
+         return obj;
+     }
+     
+     int myLinkedListGet(MyLinkedList* obj, int index) {
+         if (index >= obj->size || index < 0)
+             return -1;
+         DoubleListNode *cur = obj->data->next;
+         while (index--) {
+             cur = cur->next;
+         }
+         return cur->val;
+     }
+     
+     void myLinkedListAddAtHead(MyLinkedList* obj, int val) {
+         DoubleListNode *newNode = (DoubleListNode *)malloc(sizeof(DoubleListNode));
+         newNode->val = val;
+     
+         // 开始插入
+         newNode->next = obj->data->next;
+         if (obj->data->next)
+             obj->data->next->prev = newNode;
+         obj->data->next = newNode;
+         newNode->prev = obj->data;
+     
+         obj->size++;
+     }
+     
+     void myLinkedListAddAtTail(MyLinkedList* obj, int val) {
+         DoubleListNode *newNode = (DoubleListNode *)malloc(sizeof(DoubleListNode));
+         newNode->val = val;
+         DoubleListNode *pre = obj->data, *cur = obj->data->next;
+         while (cur) {
+             pre = cur;
+             cur = cur->next;
+         }
+         newNode->next = cur; // NULL
+         newNode->prev = pre;
+         pre->next = newNode;
+     
+         obj->size++;
+     }
+     
+     void myLinkedListAddAtIndex(MyLinkedList* obj, int index, int val) {
+         if (index > obj->size)
+             return;
+         if (index < 0)
+             index = 0;
+         DoubleListNode *newNode = (DoubleListNode *)malloc(sizeof(DoubleListNode)), *pre = obj->data, *cur = obj->data->next;
+         newNode->val = val;
+     
+         while (index--) {
+             pre = cur;
+             cur = cur->next;
+         }
+     
+         newNode->next = cur;
+         if (cur)
+             cur->prev = newNode;
+         newNode->prev = pre;
+         pre->next = newNode;
+     
+         obj->size++;
+     }
+     
+     void myLinkedListDeleteAtIndex(MyLinkedList* obj, int index) {
+         if (index >= obj->size || index < 0)
+             return;
+         DoubleListNode *pre = obj->data, *cur = obj->data->next;
+         while (index--) {
+             pre = cur;
+             cur = cur->next;
+         }
+         pre->next = cur->next;
+         if (cur->next)
+             cur->next->prev = pre;
+         free(cur);
+     
+         obj->size--;
+     }
+     
+     // 清除链表
+     void myLinkedListFree(MyLinkedList* obj) {
+         DoubleListNode *pre, *cur = obj->data->next;
+         // 先逐渐释放每个节点，最后再释放链表
+         while (cur) {
+             pre = cur;
+             cur = cur->next;
+             free(pre);
+             obj->size--;
+         }
+         free(obj);
+     }
+     
+     /**
+      * Your MyLinkedList struct will be instantiated and called as such:
+      * MyLinkedList* obj = myLinkedListCreate();
+      * int param_1 = myLinkedListGet(obj, index);
+      
+      * myLinkedListAddAtHead(obj, val);
+      
+      * myLinkedListAddAtTail(obj, val);
+      
+      * myLinkedListAddAtIndex(obj, index, val);
+      
+      * myLinkedListDeleteAtIndex(obj, index);
+      
+      * myLinkedListFree(obj);
+     */
 
 6. 无
 
@@ -137,8 +498,141 @@ def backtrack(路径, 选择列表):
 9. [25. Reverse Nodes in k-Group](https://leetcode.cn/problems/reverse-nodes-in-k-group/)
 
    - 方法一：借助gpt实现了头插法的版本
+
+     ```cpp
+     /**
+      * Definition for singly-linked list.
+      * struct ListNode {
+      *     int val;
+      *     ListNode *next;
+      *     ListNode() : val(0), next(nullptr) {}
+      *     ListNode(int x) : val(x), next(nullptr) {}
+      *     ListNode(int x, ListNode *next) : val(x), next(next) {}
+      * };
+      */
+     class Solution {
+     public:
+         ListNode* reverseKGroup(ListNode* head, int k) {
+             ListNode* dummyHead = new ListNode(0);
+             dummyHead->next = head;
+             ListNode* pre = dummyHead;
+             
+             while (true) {
+                 // 检查剩余节点是否有k个
+                 ListNode* node = pre;
+                 for (int i = 0; i < k && node != nullptr; i++) {
+                     node = node->next;
+                 }
+                 if (node == nullptr) break; // 不足k个，退出循环
+                 
+                 ListNode* cur = pre->next;
+                 ListNode* start = cur; // 记录当前组的第一个节点，反转后变为最后一个
+                 
+                 // 反转当前组的k个节点
+                 for (int i = 0; i < k; i++) {
+                     ListNode* t = cur->next;
+                     cur->next = pre->next;
+                     pre->next = cur;
+                     cur = t;
+                 }
+                 
+                 // 更新pre指针到下一组的前面
+                 start->next = cur;
+                 pre = start;
+             }
+             
+             return dummyHead->next;
+         }
+     };
+
    - 方法二：自己尝试着用递归解出来了！
+
+     ```cpp
+     /**
+      * Definition for singly-linked list.
+      * struct ListNode {
+      *     int val;
+      *     ListNode *next;
+      *     ListNode() : val(0), next(nullptr) {}
+      *     ListNode(int x) : val(x), next(nullptr) {}
+      *     ListNode(int x, ListNode *next) : val(x), next(next) {}
+      * };
+      */
+     class Solution {
+     public:
+         ListNode* reverseKGroup(ListNode* head, int k) {
+             // 尝试用递归思考去解决：本任务是要以按照k个节点为一组来为每一组进行逆序，而对于达不到k个元素的就不需要逆序，那么算法可以优化成：先对一组去逆序，接着在对后续的元素按照k个节点为一组的方式去调用递归。我觉得难点在于递归前后传递这些，以及应该从哪里开始之类的
+             // 先判断边界情况
+             if (!head || k == 1)    return head;
+             
+             ListNode *dummyHead = new ListNode(0, head);
+             for (int i = 0; i < k && dummyHead; i++) dummyHead = dummyHead->next;
+             if (!dummyHead) return head;  // 如果达不到k个，则原顺序返回
+     
+             ListNode *cur, *pre, *start, *t;
+             pre = nullptr;
+             start = head;
+             cur = start;
+     
+             for (int i = 0; i < k && cur; i++) {
+                 t = cur->next;
+                 cur->next = pre;
+                 pre = cur;
+                 cur = t;
+             }
+     
+             // pre = start;
+             start->next = reverseKGroup(cur, k);
+     
+             return pre;
+         }
+     };
+
    - 方法三：递归和封装函数来解决此问题
+
+     ```cpp
+     /**
+      * Definition for singly-linked list.
+      * struct ListNode {
+      *     int val;
+      *     ListNode *next;
+      *     ListNode() : val(0), next(nullptr) {}
+      *     ListNode(int x) : val(x), next(nullptr) {}
+      *     ListNode(int x, ListNode *next) : val(x), next(next) {}
+      * };
+      */
+     class Solution {
+     public:
+         ListNode* reverseKGroup(ListNode* head, int k) {
+             // 尝试用递归思考去解决：本任务是要以按照k个节点为一组来为每一组进行逆序，而对于达不到k个元素的就不需要逆序，那么算法可以优化成：先对一组去逆序，接着在对后续的元素按照k个节点为一组的方式去调用递归。我觉得难点在于递归前后传递这些，以及应该从哪里开始之类的
+             // 先判断边界情况
+             if (!head || k == 1)    return head;
+             
+             ListNode *end = head;
+             for (int i = 0; i < k; i++) {
+                 if (!end) return head;  // 如果达不到k个，则原顺序返回
+                 end = end->next;
+             }
+     
+             ListNode *pre = reverse(head, k);
+             head->next = reverseKGroup(end, k);
+     
+             return pre;  // 表示的是每一组的最后一个节点，逆序后就成为了首节点
+         }
+         ListNode* reverse(ListNode *head, int k) {
+             ListNode *cur, *pre, *t;
+             pre = nullptr;
+             cur = head;
+     
+             for (int i = 0; i < k; i++) {
+                 t = cur->next;
+                 cur->next = pre;
+                 pre = cur;
+                 cur = t;
+             }
+             return pre;
+         }
+     };
 
    [141. Linked List Cycle](https://leetcode.cn/problems/linked-list-cycle/)
 
@@ -189,6 +683,8 @@ def backtrack(路径, 选择列表):
     2. 方法二：这题一看就可以用递归解，比如将交换链表中的每两个元素变为只交换一个，但是交换完之后，将pre指针指向调用递归后的结果
 
 15. 无
+
+    ### 哈希表
 
 16. 常见的三种哈希结构
 
@@ -275,6 +771,8 @@ def backtrack(路径, 选择列表):
     1. 方法一：用辅助空间的方式
     2. 方法二：不使用辅助空间的方法
 
+    ### 字符串
+
     [541. Reverse String II](https://leetcode.cn/problems/reverse-string-ii/)
 
     1. 一层循环搞定
@@ -299,10 +797,47 @@ def backtrack(路径, 选择列表):
 27. [459. Repeated Substring Pattern](https://leetcode.cn/problems/repeated-substring-pattern/)
 
     1. 方法一：暴力解
+
     2. 方法二：由数学归纳法可以发现，将两个s放在一起，去掉头尾一个字符，如果能在剩余中找到任意一个s，则说明是存在重复的
+
     3. 方法三：kmp
 
-    
+       ```cpp
+           bool repeatedSubstringPattern(string s) {
+               // 可以发现，如果一个字符串s是由重复子串组成，那么 最长相等前后缀不包含的子串一定是字符串s的最小重复子串况）
+               // 由此可以得到此题解的步骤：
+               // 1.建立next数组
+               int n = s.size();
+               vector<int> next(n);
+               getNext(&next[0], s);
+       
+               // 2.找到最长相等前后缀不包含的子串的长度，如果不能被s字符串长度整除或者长度大于s字符串长度的一半，则不符合；否则一定成立
+               int t = n - next.back(); // next[n - 1]
+               if (n % t != 0 || t > ceil(n / 2))
+                   return false;
+               return true;
+           }
+       ```
+
+## 7月
+
+> 暑假回到家里就开摆了，在家管不住自己学习，一直在玩呀玩，就压根没怎么学了，月底31号时学了栈和队列开头
+
+7.31
+
+[232. Implement Queue using Stacks](https://leetcode.cn/problems/implement-queue-using-stacks/)
+
+通过双栈的方式可以很容易实现队列的功能：一个是入栈的，另一个是根据入栈来调整的出栈
+
+[225. Implement Stack using Queues](https://leetcode.cn/problems/implement-stack-using-queues/)
+
+同样通过双队列的方式可以实现栈的功能：用第二个队列来进行备份（每次移动n-1个元素过去），这样剩下一个元素就是top元素
+
+单队列的方式同样可以实现栈的功能：将前n-1个元素再一次插入到尾部，这样头元素就是栈top的元素了
+
+## 8月
+
+
 
 
 

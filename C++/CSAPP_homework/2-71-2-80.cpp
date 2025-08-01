@@ -48,6 +48,7 @@ int saturating_add(int x, int y) {
 // I* Determine whether arguments can be subtracted without overflow *I
 // 如果计算 x-y 不溢出，这个函数就返回 1 。
 int tsub_ok(int x, int y) {
+    // 表示x - y
     int diff = x + (~y + 1);
     // 得到x 和 y 的符号位右移而成的掩码，0xff..f 表示的是负值，0x0 表示的是正值
     int w = (sizeof(int) << 3) - 1;
@@ -65,6 +66,29 @@ int tsub_ok(int x, int y) {
     return !(pos_overflow || neg_overflow);
 }
 
+// 2.75 unsigned_high_prod#
+// 假设我们想要计算x*y的完整的2w位表示，x、y都是无符号数，并且运行在数据类型unsigined是w位的机器上，乘积的低w位能够用表达式x*y计算，所以需要一个具有下列原型的函数：
+// unsigned unsiged_high_prod(unsigned x,unsigned y);
+// 计算无符号变量x乘以y的高w位，使用一个具有下面原型的库函数；int signed_high_pord(int x,int y)，计算x和y采用补码形式的情况下，x乘以y的高w位，编写代码调用这个过程，以实现无符号数为参数的函数，验证你的解答。
+// 提示：看看等式2.18的推导中，有符号乘积x乘以y和无符号乘积x'乘以y'之间的关系。
+// 等式2.18:(x′⋅y′)mod2w=(x⋅y)mod2w
+int signed_high_prod(int x, int y) {//取出有符号数的高w位（32）
+	int64_t mul = (int64_t) x * y;
+	return mul >> 32;
+}
+// 求无符号数的高w位
+unsigned unsigned_high_prod(unsigned x, unsigned y) {
+	int sig_x = x >> 31;//获取x的符号，0或者1
+	int sig_y = y >> 31;//获取y的符号
+	int signed_prod = signed_high_prod(x, y);
+	return signed_prod + x * sig_y + y * sig_x;
+}
+
+// void *malloc(size)t size);
+// void *memset(void *s,int c,size_t n);
+
+
+
 int main(void) {
     cout << (xbyte(0x00112233, 2) == 0x11) << endl;
 
@@ -80,9 +104,12 @@ int main(void) {
     cout << "5 - 3 = " << tsub_ok(5, 3) << endl;           // 输出: 1（不溢出）
     // 正溢出
     cout << "INT_MAX - INT_MIN = " << tsub_ok(INT_MAX, INT_MIN) << endl; // 输出: 0（溢出）
-    
     // 负溢出
     cout << "INT_MIN - INT_MAX = " << tsub_ok(INT_MIN, INT_MAX) << endl; // 输出: 0（溢出）
     
+    // x正，y正
+    cout << "unsigned_high_prod(0x80000000, 0x80000000) = " 
+        << unsigned_high_prod(0x80000000u, 0x80000000u) << endl; 
+    // 预期：0x80000000 * 0x80000000 = 0x4000000000000000，高32位为0x40000000（十进制1073741824）
     return 0;
 }

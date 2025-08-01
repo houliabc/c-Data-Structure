@@ -203,11 +203,36 @@ def backtrack(路径, 选择列表):
         撤销选择
 ```
 
+# 栈和队列
 
+## c++的情况
 
+栈和队列使用的是SGI STL 的标准库
 
+> 三个最为普遍的STL版本：
+>
+> 1. HP STL 其他版本的C++ STL，一般是以HP STL为蓝本实现出来的，HP STL是C++ STL的第一个实现版本，而且开放源代码。
+> 2. P.J.Plauger STL 由P.J.Plauger参照HP STL实现出来的，被Visual C++编译器所采用，不是开源的。
+> 3. SGI STL 由Silicon Graphics Computer Systems公司参照HP STL实现，被Linux的C++编译器GCC所采用，SGI STL是开源软件，源码可读性甚高。
 
+STL中栈和队列往往不被归类为容器，而被归类为**container adapter（容器适配器）**。
 
+![栈与队列理论3](https://houlir2.dpdns.org/2025/07/679492fcf69aae0ac8c937adf8fcaf31.png)
+
+**栈和队列**内部存储数据的方式都**默认是deque的方式**，对外提供的借口才是栈和队列常规的操作
+
+> deque是一个双向队列，只要封住一端，只开通另一端就可以实现栈的逻辑了。
+
+## 初始化
+
+```cpp
+std::stack<int, std::vector<int>> third;  // 使用vector为底层容器的栈
+std::queue<int, std::list<int>> third;  // 使用list为底层容器的队列
+
+// 默认的情况下
+stack<int> st;
+queue<int> de;
+```
 
 
 
