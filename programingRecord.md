@@ -837,7 +837,49 @@ def backtrack(路径, 选择列表):
 
 ## 8月
 
+1. [20. Valid Parentheses](https://leetcode.cn/problems/valid-parentheses/)
 
+   方法一：将全部元素进栈，当遇到右括号就出栈
+
+   方法二：当遇到左括号时，将对应的有括号入栈；而当遇到右括号时，出栈看匹不匹配，如果不匹配直接返回0了
+
+   [1047. Remove All Adjacent Duplicates In String](https://leetcode.cn/problems/remove-all-adjacent-duplicates-in-string/)
+
+   方法一：就正常每个元素压入栈中解
+
+   方法二：运用在官解中的string容器自带的入栈出栈功能来实现
+
+2. [150. Evaluate Reverse Polish Notation](https://leetcode.cn/problems/evaluate-reverse-polish-notation/)
+
+   只是求结果而不是实现运算器的功能就容易很多，因为实现运算器需要考虑很多特殊情况，输入有问题的情况，这题直接求值保证输入没问题的情况下是很简单做出来的
+
+   [239. Sliding Window Maximum](https://leetcode.cn/problems/sliding-window-maximum/)
+
+   方法一：本题运用了一个**新知识点单调队列**的方法：递增或递减的队列
+
+   方法二：尝试将队列封装起来的方法来实现本题目
+
+3. 无
+
+4. 无
+
+5. 无
+
+6. 无
+
+7. 无
+
+8. 无
+
+9. 无
+
+10. 无
+
+11. [347. Top K Frequent Elements](https://leetcode.cn/problems/top-k-frequent-elements/)
+
+    方法一：运用到了哈希表统计个数，之后调换键值，以此来选出 k 个出现频率最多的
+    时间复杂度O(n + n + n) = O(n)
+    空间复杂度O(n + n * logn + n) = O(nlogn)
 
 
 
