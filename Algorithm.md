@@ -1,4 +1,6 @@
-在本文章中，更多的是将关于c++的数据结构定义和使用方法，没啥题目，除非一些非常经典的题
+在本文章中，记录了本人觉得值得关注的关于C++的数据结构定义、使用方法和一些值得关注的C++高级知识点，没啥题目，除非一些非常经典的题
+
+章节顺序根据[代码随想录](https://www.programmercarl.com/)的C++算法来的
 
 <!--more-->
 
@@ -387,7 +389,25 @@ C++ 标准库容器可分为 **序列容器**、**关联容器**、**无序关�
    - 键值对映射 + 快速查找 → `unordered_map`；
    - 栈 / 队列逻辑 → 对应适配器。
 
-## pair
+## String
+
+C 语言中是在`<string.h>` 库中；而 CPP 中是`<string>`即可
+
+`string`好就好在他**重载了加法运算符（支持字符串加法）和比较运算符**
+
+### 转 char 数组
+
+String 转换为 char 是变成 C 语言中类似 字符数组的情况：
+
+```cpp
+printf("%s", s);          // 编译错误
+printf("%s", s.data());   // 编译通过，但是是 undefined behavior
+printf("%s", s.c_str());  // 一定能够正确输出
+```
+
+
+
+## Pair
 
 `std::pair` 是标准库中定义的一个类模板。**用于将两个变量关联在一起，组成一个「对」，而且两个变量的数据类型可以是不同的。**
 
@@ -400,3 +420,117 @@ C++ 标准库容器可分为 **序列容器**、**关联容器**、**无序关�
 > 与自定义的 `struct` 相比，`pair` 不需要额外定义结构与重载运算符，因此使用起来更加**简便**。
 >
 > 然而，自定义 `struct` 的变量命名往往更加清晰（`pair` **只能使用** `first` 与 `second` 访问包含的两个变量）。同时，**如果需要将两个以上的变量进行关联，自定义 `struct` 会更加合适。**
+
+### 定义
+
+```cpp
+#define mp make_pair
+int main() {
+    // 初始化方法一
+    pair<int, float> it;
+    it.first = 1;
+    it.second = 2.0;
+    cout << it.first + it.second;
+
+    // 初始化方法二
+    pair<int, double> it2 = std::make_pair(3, 4.1);
+
+    // 初始化方法三
+    auto it3 = mp(2, 4.2);
+    return 0;
+}
+```
+
+### 比较
+
+`pair` 已经预先定义了所有的比较运算符，包括 `<`、`>`、`<=`、`>=`、`==`、`!=`。
+
+其中，`<`、`>`、`<=`、`>=` 四个运算符会**先比较两个 `pair` 中的第一个变量，在第一个变量相等的情况下再比较第二个变量。**
+
+```cpp
+// 比较（直接对pair类型比较，而不是里面的成员）
+if (it < it2) cout << "it2 win";
+```
+
+由于 `pair` 定义了 STL 中常用的 `<` 与 `==`，使得其能够很好的与其他 STL 函数或数据结构配合。比如，**`pair` 可以作为 `priority_queue` 的数据类型。**
+
+```cpp
+priority_queue<pair<int, double>> q;  // 优先级队列
+```
+
+### 离散化
+
+`pair` 可以轻松实现离散化。
+
+我们可以创建一个 `pair` 数组，将原始数据的**值作为每个 `pair` 第一个变量**，将原始数据的**位置作为第二个变量**。在排序后，将原始数据值的排名（该值排序后所在的位置）赋给该值原本所在的位置即可。
+
+```cpp
+// `pair` 可以轻松实现离散化。
+// a为原始数据
+pair<int, int> a[MAXN];
+// ai为离散化后的数据
+int ai[MAXN];
+for (int i = 0; i < n; i++) {
+  // first为原始数据的值，second为原始数据的位置（下标，从0开始）
+  scanf("%d", &a[i].first);
+  a[i].second = i;
+}
+
+// 排序
+sort(a, a + n);  // 这里用到了数组地址的特性，如果是容器，使用的方式是 xx.begin()
+
+for (int i = 0; i < n; i++) {
+  // 将该值的排名（从0开始）赋给该值原本所在的位置
+  ai[a[i].second] = i;
+}
+```
+
+### Dijkstra
+
+如前所述，`pair` 可以作为 `priority_queue` 的数据类型。
+
+那么，在 Dijkstra 算法的堆优化中，可以使用 `pair` 与 `priority_queue` 维护节点，将节点当前到起点的距离作为第一个变量，将节点编号作为第二个变量。
+
+```cpp
+priority_queue<pair<int, int>, std::vector<pair<int, int>>,
+               std::greater<pair<int, int>>>
+    q;
+... while (!q.empty()) {
+  // dis为入堆时节点到起点的距离，i为节点编号
+  int dis = q.top().first, i = q.top().second;
+  q.pop();
+  ...
+}
+```
+
+### pair 与 map
+
+`map` 的是 C++ 中存储键值对的数据结构。很多情况下，**`map` 中存储的键值对通过 `pair` 向外暴露。**
+
+```cpp
+map<int, double> m; 
+m.insert(make_pair(1, 2.0));
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
