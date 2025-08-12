@@ -3,7 +3,7 @@
 using namespace std;
 
 int main(){
-    string firstName = "Liu", lastName = "wen";
+    string firstName = "Liu", lastName = "wen", s = firstName;
     string fullName = firstName + lastName;  //c++字符串可以相加
     cout << fullName << endl << endl;
 
@@ -13,5 +13,8 @@ int main(){
     cout << "The size of the fullName is " << fullName.size() << endl;  //相同的
 
     cout << fullName[0] << endl;
+
+    // String to char
+    printf("%s", s.c_str());
     return 0;
 }

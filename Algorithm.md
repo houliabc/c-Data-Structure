@@ -389,6 +389,14 @@ C++ 标准库容器可分为 **序列容器**、**关联容器**、**无序关�
    - 键值对映射 + 快速查找 → `unordered_map`；
    - 栈 / 队列逻辑 → 对应适配器。
 
+## STL 算法
+
+C++STL中的内置算法主要在[头文件](https://so.csdn.net/so/search?q=头文件&spm=1001.2101.3001.7020)`<algorithm>`、`<functional>`、`<numeric>`中
+
+- `<algorithm>`是所有STL头文件中最大的一个，也是包含算法最多，最常用的一个头文件，其中包含比较、交换、查找、遍历、复制、修改等算法
+- `<numeric>`体积很小，只包括几个在序列上面进行简单数学运算的模板函数
+- `<functional>`定义了一些模板类，用以声明函数对象(仿函数)
+
 ## String
 
 C 语言中是在`<string.h>` 库中；而 CPP 中是`<string>`即可
@@ -404,6 +412,17 @@ printf("%s", s);          // 编译错误
 printf("%s", s.data());   // 编译通过，但是是 undefined behavior
 printf("%s", s.c_str());  // 一定能够正确输出
 ```
+
+### 各种 string 方法
+
+| 功能                     | 原型                                                    | 补充                                                         |
+| ------------------------ | ------------------------------------------------------- | ------------------------------------------------------------ |
+| 长度                     | strlen(s)、s.size()` 和 `s.length()                     | 推荐用后两种                                                 |
+| 查第一次出现位置（下标） | s.find(str, pos)                                        | pos默认是0；如果没有出现，则返回 `string::npos`（被定义为 `-1`，但类型仍为 `size_t`/`unsigned long`） |
+| 截取子串                 | s.substr(pos, len)                                      | 从 `pos` 位置开始截取最多 `len` 个字符组成的字符串（如果从 `pos` 开始的后缀长度不足 `len` 则截取这个后缀）。 |
+| 插入字符（串）           | s.insert(index, str)或s.insert(index, count, ch)        | 第一个是在下标插入字符串；第二个是插入count个ch字符          |
+| 删除字符串               | s.erase(index, count)                                   | 若不传参给 `count` 则表示删去 `index` 位置及以后的所有字符） |
+| 替换字符（串）           | replace(pos, count, str)` 和 `replace(first, last, str) | 将从 `pos` 位置开始 `count` 个字符的子串替换为 `str` <br>将以 `first` 开始（含）、`last` 结束（不含）的子串替换为 `str`，其中 `first` 和 `last` 均为迭代器。 |
 
 
 
