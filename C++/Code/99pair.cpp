@@ -18,7 +18,7 @@ int main() {
     pair<int, double> it2 = std::make_pair(3, 4.1);
 
     // 初始化方法三
-    auto it3 = mp(2, 4.2);
+    pair<int, float> it3 = {1, 'a'};
 
     // 比较（直接对pair类型比较，而不是里面的成员）
     if (it < it2) cout << "it2 win" << endl;
