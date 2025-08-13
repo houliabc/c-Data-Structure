@@ -442,6 +442,100 @@ C++STL中的内置算法主要在[头文件](https://so.csdn.net/so/search?q=头
 - `<numeric>`体积很小，只包括几个在序列上面进行简单数学运算的模板函数
 - `<functional>`定义了一些模板类，用以声明函数对象(仿函数)
 
+### 算法库 Algorithm
+
+1. [ ] `count()`
+
+2. [ ] `find()`
+
+3. [ ] `fill()`
+
+4. **[x] [`swap()`](https://zh.cppreference.com/w/cpp/algorithm/swap)**
+
+   ```cpp 
+   swap(a, b);
+
+5. **[x] [`reverse()`](https://zh.cppreference.com/w/cpp/algorithm/reverse)**
+
+   反转一个可**迭代对象**的元素顺序(要用迭代器)
+
+   ```cpp
+   reverse(s.begin(), s.end());
+
+6. [ ] `shuffle()` C++11
+
+7. **[x] [`unique()`](https://zh.cppreference.com/w/cpp/algorithm/unique)**
+
+   消除数组的**重复相邻**元素（**如果有序，就能去重**），数组长度不变，但是有效数据缩短，**返回**的是有效数据位置的**结尾迭代器。**
+
+   例如：[1, 1, 4, 5] -> [1, 4, 5, ?]，下划线位置为返回的迭代器指向。
+
+   ```cpp
+   vector<int> arr{1, 2, 1, 4, 5, 4, 4};
+   sort(arr.begin(), arr.end());
+   arr.erase(unique(arr.begin(), arr.end()), arr.end());
+
+8. **[x] [`sort()`](https://zh.cppreference.com/w/cpp/algorithm/sort)**
+
+   要用迭代器
+
+   ```cpp
+   void sort( RandomIt first, RandomIt last, Compare comp );  // 可以选用比较器
+
+9. **[x] [`lower_bound()`](https://zh.cppreference.com/w/cpp/algorithm/lower_bound) / [`upper_bound()`](https://zh.cppreference.com/w/cpp/algorithm/upper_bound)**
+
+   在**已升序排序**的元素中，应用二分查找检索指定元素，返回对应元素迭代器位置。**找不到则返回尾迭代器。**
+
+   - `lower_bound()`: 寻找 ≥x 的第一个元素的位置
+   - `upper_bound()`: 寻找 >x 的第一个元素的位置
+
+   怎么找 / 的第一个元素呢？
+
+   -  \>x 的第一个元素的前一个元素（如果有）便是 ≤x 的第一个元素
+   -  ≥x  的第一个元素的前一个元素（如果有）便是 <x 的第一个元素
+
+   返回的是迭代器，如何转成下标索引呢？减去头迭代器即可。
+
+   ```cpp
+   //原型一
+   ForwardIterator lower_bound (ForwardIterator first, ForwardIterator last,  const T& val);
+   //原型二
+   ForwardIterator lower_bound (ForwardIterator first, ForwardIterator last, const T& val, Compare comp);  // 可以指定一个 cmp 比较器
+   
+   // 示例
+   vector<int> arr{0, 1, 1, 1, 8, 9, 9};
+   idx = lower_bound(arr.begin(), arr.end(), 7) - arr.begin(); // 4
+   idx = lower_bound(arr.begin(), arr.end(), 8) - arr.begin(); // 4
+   idx = upper_bound(arr.begin(), arr.end(), 7) - arr.begin(); // 4
+   idx = upper_bound(arr.begin(), arr.end(), 8) - arr.begin(); // 5
+
+10. **[x] [`max()`](https://zh.cppreference.com/w/cpp/algorithm/max) / [`min()`](https://zh.cppreference.com/w/cpp/algorithm/min)**
+
+11. [ ] `max_element()` / `min_element()`
+
+12. [ ] `prev_permutation()` / `next_permutation()`
+
+1. 数学函数 cmath
+   1. **[x] [`abs()`](https://zh.cppreference.com/w/cpp/numeric/math/fabs)**
+   2. **[x] [`exp()`](https://zh.cppreference.com/w/cpp/numeric/math/exp)**
+   3. **[x] [`log()`](https://zh.cppreference.com/w/cpp/numeric/math/log) / `log10()` / `log2()`**
+   4. **[x] [`pow()`](https://zh.cppreference.com/w/cpp/numeric/math/pow)**
+   5. **[x] [`sqrt()`](https://zh.cppreference.com/w/cpp/numeric/math/sqrt)**
+   6. [ ] `sin()` / `cos()` / `tan()`
+   7. [ ] `asin()` / `acos()` / `atan()`
+   8. [ ] `sinh()` / `cosh()` / `tanh()`
+   9. [ ] `asinh()` / `acosh()` / `atanh()` C++11
+   10. **[x] [`ceil()`](https://zh.cppreference.com/w/cpp/numeric/math/ceil) / [`floor()`](https://zh.cppreference.com/w/cpp/numeric/math/floor)**
+   11. **[x] [`round()`](https://zh.cppreference.com/w/cpp/numeric/math/round) C++11**
+2. 数值算法 numeric
+   1. [ ] `iota()` C++11
+   2. [ ] `accumulate()`
+   3. **[x] [`gcd()`](https://zh.cppreference.com/w/cpp/numeric/gcd) C++17**
+   4. **[x] [`lcm()`](https://zh.cppreference.com/w/cpp/numeric/lcm) C++17**
+3. 伪随机数生成 random
+   1. [ ] `mt19937`
+   2. [ ] `random_device()`
+
 ## String
 
 C 语言中是在`<string.h>` 库中；而 CPP 中是`<string>`即可
