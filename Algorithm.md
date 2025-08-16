@@ -326,6 +326,10 @@ priority_queue<int, vector<int>, greater<int>> pque2; // 储存int的小顶堆
 
 # 二叉树
 
+**C++中map、set、multimap，multiset的底层实现都是平衡二叉搜索树**，所以map、set的增删操作时间时间复杂度是logn
+
+> 而unordered_map、unordered_set，unordered_map、unordered_set底层实现是**哈希表**。
+
 回溯算法的框架：
 
 ```

@@ -1521,7 +1521,7 @@ make
 
 ## 程序编码
 
-最简单的形式：`gcc -)g -o sum sum1.o sum2.o`
+最简单的形式：`gcc -Og -o sum sum1.o sum2.o`
 
 gcc详细使用可参见：[点击](./Algorithm.md###gcc编译选项)
 
@@ -1542,9 +1542,45 @@ gcc详细使用可参见：[点击](./Algorithm.md###gcc编译选项)
 
 ### 汇编代码解释
 
-1. call：调用函数
-2. (%xx)：括号包起来表示地址
-3. ret：return
+1. %rxx：表示寄存器
+
+2. (%rx)：括号包起来表示地址
+
+   > r开头表示64位
+   >
+   > e表示32位
+   >
+   > **最多可以有6个寄存器（共16个）参数，顺序为 %rdi -> %rsi -> %rax ->rdx**
+   >
+   > <img src="https://houlir2.dpdns.org/2025/08/ef95b2493278b152cee7ac2de9ab2366.png" alt="image-20250816090645503" style="zoom: 20%;" />
+   >
+   > %rsp是栈寄存器；%rip表示指令指针（当前位置）
+
+3. \d(%rxx)：表示位移（displacement），等价于 (%rxx + \d)
+
+   <img src="https://houlir2.dpdns.org/2025/08/f216faf243b8d2dde1e18e03b88f65c9.png" alt="image-20250816091407625" style="zoom:20%;" />
+
+   扩展用法：
+
+   <img src="https://houlir2.dpdns.org/2025/08/6e3d9ad24113f9d9c0ac03e1ef0bc7ed.png" alt="image-20250816092102821" style="zoom:20%;" />
+
+   案例：
+
+   <img src="https://houlir2.dpdns.org/2025/08/4f1ff8b23717f168f2ecd76d882c9085.png" alt="image-20250816092357009" style="zoom:20%;" />
+
+4. `movq Source, Dest`
+
+   可以操作的对象：常量、寄存器和内存
+
+   注意事项：不能从内存移到内存，而需要两部操作
+
+   <img src="https://houlir2.dpdns.org/2025/08/e0038bc3fe116d885d33fd74fbe9419e.png" alt="image-20250816091035520" style="zoom: 20%;" />
+
+   > q结尾表示是四字==64位的意思
+
+5. call：调用函数
+
+6. ret：return
 
 
 
@@ -1553,6 +1589,14 @@ gcc详细使用可参见：[点击](./Algorithm.md###gcc编译选项)
 `objdump -d sum.exe/sum.o`
 
 
+
+### GDB调试
+
+> 同样也可以实现反汇编的功能
+
+进入GDB调试：`gdb sum`
+
+反汇编：`disassemble sumstore`
 
 ## 数据格式
 
