@@ -12,106 +12,6 @@
 
 以下内容是CSAPP中的核心，对于理解计算机系统的工作原理至关重要：
 
-**第一部分：程序结构和执行 (Program Structure and Execution)**
-
-- **第1章：计算机系统漫游 (A Tour of Computer Systems)**
-  - 1.1 信息就是位 + 上下文 (Information is Bits + Context)
-  - 1.2 程序被其他程序翻译成不同格式 (Programs Are Translated by Other Programs into Different Forms)
-  - 1.3 了解编译系统如何工作是大有益处的 (It Pays to Understand How Compilation Systems Work)
-  - 1.4 处理器读并解释存储在存储器中的指令 (Processors Read and Interpret Instructions Stored in Memory)
-    - 1.4.1 系统的硬件组成 (Hardware Organization of a System)
-    - 1.4.2 运行 Hello 程序 (Running the hello Program)
-  - 1.5 高速缓存至关重要 (Caches Matter)
-  - 1.6 存储设备形成层次结构 (Storage Devices Form a Hierarchy)
-  - 1.7 操作系统管理硬件 (The Operating System Manages the Hardware)
-    - 1.7.1 进程 (Processes)
-    - 1.7.2 线程 (Threads)
-    - 1.7.3 虚拟内存 (Virtual Memory)
-    - 1.7.4 文件 (Files)
-  - 1.9 并发和并行 (Concurrency and Parallelism)
-    - 1.9.1 线程级并发 (Thread-Level Concurrency)
-    - 1.9.2 指令级并行 (Instruction-Level Parallelism)
-    - 1.9.3 单指令、多数据并行 (Single-Instruction, Multiple-Data (SIMD) Parallelism)
-  - 1.10 计算机系统中抽象的重要性 (The Importance of Abstractions in Computer Systems)
-- **第2章：信息的表示和处理 (Representing and Manipulating Information)**
-  - 2.1 信息存储 (Information Storage)
-    - 2.1.1 十六进制表示法 (Hexadecimal Notation)
-    - 2.1.2 字 (Words)
-    - 2.1.3 数据大小 (Data Sizes)
-    - 2.1.4 寻址和字节顺序 (Addressing and Byte Ordering) (重点理解大端和小端)
-    - 2.1.7 C语言中的位级运算 (Bit-Level Operations in C)
-    - 2.1.8 C语言中的逻辑运算 (Logical Operations in C)
-    - 2.1.9 C语言中的移位运算 (Shift Operations in C)
-  - 2.2 整数表示 (Integer Representations)
-    - 2.2.1 整型数据类型 (Integral Data Types)
-    - 2.2.2 无符号编码 (Unsigned Encodings)
-    - 2.2.3 补码编码 (Two’s-Complement Encodings)
-    - 2.2.4 有符号数和无符号数之间的转换 (Conversions Between Signed and Unsigned)
-    - 2.2.5 C语言中的有符号数与无符号数 (Signed vs. Unsigned in C)
-    - 2.2.6 扩展一个数字的位表示 (Expanding the Bit Representation of a Number)
-    - 2.2.7 截断数字 (Truncating Numbers)
-    - 2.2.8 关于有符号数和无符号数的建议 (Advice on Signed vs. Unsigned)
-  - 2.3 整数运算 (Integer Arithmetic)
-    - 2.3.1 无符号加法 (Unsigned Addition)
-    - 2.3.2 补码加法 (Two’s-Complement Addition)
-    - 2.3.3 补码的非 (Two’s-Complement Negation)
-    - 2.3.4 无符号乘法 (Unsigned Multiplication)
-    - 2.3.5 补码乘法 (Two’s-Complement Multiplication)
-    - 2.3.6 乘以常数 (Multiplying by Constants)
-    - 2.3.7 除以2的幂 (Dividing by Powers of 2)
-    - 2.3.8 关于整数运算的最后思考 (Final Thoughts on Integer Arithmetic)
-  - 2.4 浮点数 (Floating Point)
-    - 2.4.1 二进制小数 (Fractional Binary Numbers)
-    - 2.4.2 IEEE浮点表示 (IEEE Floating-Point Representation)
-    - 2.4.3 数字示例 (Example Numbers)
-    - 2.4.4舍入 (Rounding)
-    - 2.4.5 浮点运算 (Floating-Point Operations)
-    - 2.4.6 C语言中的浮点数 (Floating Point in C)
-- **第3章：程序的机器级表示 (Machine-Level Representation of Programs)** (这一章极为重要)
-  - 3.1 历史观点 (A Historical Perspective)
-  - 3.2 程序编码 (Program Encodings)
-    - 3.2.1 机器级代码 (Machine-Level Code)
-    - 3.2.2 代码示例 (Code Examples)
-    - 3.2.3 关于格式的注解 (Notes on Formatting)
-  - 3.3 数据格式 (Data Formats)
-  - 3.4 访问信息 (Accessing Information)
-    - 3.4.1 操作数指示符 (Operand Specifiers)
-    - 3.4.2 数据传送指令 (Data Movement Instructions) (MOV类指令)
-    - 3.4.3 数据传送示例 (Data Movement Examples)
-    - 3.4.4 压入和弹出栈数据 (Pushing and Popping Stack Data)
-  - 3.5 算术和逻辑操作 (Arithmetic and Logical Operations)
-    - 3.5.1 加载有效地址 (Load Effective Address) (leaq指令)
-    - 3.5.2 一元和二元操作 (Unary and Binary Operations)
-    - 3.5.3 移位操作 (Shift Operations)
-    - 3.5.4 特殊的算术操作 (Special Arithmetic Operations)
-  - 3.6 控制 (Control) (理解汇编如何实现if/else, switch, loop)
-    - 3.6.1 条件码 (Condition Codes)
-    - 3.6.2 访问条件码 (Accessing the Condition Codes)
-    - 3.6.3 跳转指令及其编码 (Jump Instructions and their Encodings)
-    - 3.6.4 跳转指令的实现 (Implementing Conditional Branches with Jumps)
-    - 3.6.5 循环 (Loops) (do-while, while, for)
-    - 3.6.6 条件传送指令 (Conditional Move Instructions)
-    - 3.6.7 Switch语句 (Switch Statements)
-  - 3.7 过程 (Procedures) (函数调用栈帧结构是核心)
-    - 3.7.1 栈帧结构 (Stack Frame Structure)
-    - 3.7.2 转移控制 (Transferring Control) (call, ret)
-    - 3.7.3 寄存器使用惯例 (Register Usage Conventions)
-    - 3.7.4 过程示例 (Procedure Example)
-    - 3.7.5 递归过程 (Recursive Procedures)
-  - 3.8 数组分配和访问 (Array Allocation and Access)
-    - 3.8.1 基本原则 (Basic Principles)
-    - 3.8.2 指针运算 (Pointer Arithmetic)
-    - 3.8.3 嵌套的数组 (Nested Arrays)
-    - 3.8.4 定长数组 (Fixed-Size Arrays)
-    - 3.8.5 变长数组 (Variable-Size Arrays)
-  - 3.9 异构数据结构 (Heterogeneous Data Structures) (结构体和联合体)
-    - 3.9.1 结构 (Structures)
-    - 3.9.2 联合 (Unions)
-    - 3.9.3 数据对齐 (Data Alignment)
-  - 3.10 将控制流与数据流结合起来以避免过程调用开销 (Combining Control with Data Flow to Avoid Procedure Call Overhead) (如循环展开)
-  - 3.11 浮点代码 (Floating-Point Code) (了解即可，优先级稍低)
-  - 3.12 x86-64中的IA32兼容性 (IA32 Compatibility in x86-64) (了解即可)
-
 **第二部分：在系统中运行代码 (Running Code on a System)**
 
 - **第5章：优化程序性能 (Optimizing Program Performance)**
@@ -1544,17 +1444,35 @@ gcc详细使用可参见：[点击](./Algorithm.md###gcc编译选项)
 1. 指令集架构（Instruction Set Architecture，**ISA**）：定义处理器状态、指令格式、每条指令对状态的影响
 2. 程序内存包含：程序的可执行机器代码，操作系统需要的一些信息，用来管理过程调用和返回的运行时栈，以及用户分配的内存块（比如说用 malloc 库函数分配的）  
 
-常见术语
+**常见术语**
 
-- 程序计数器（Program Counter，PC）：将执行的下一条指令在内存中的地址，用`%rip表示`
+**阶段 1：取指令（PC + 控制器 + 内存 + 总线 + 缓存）**
 
-### 反汇编器
+1. 程序计数器（Program Counter，PC）：将执行的下一条指令在内存中的地址，用`%rip表示`	
 
-`objdump -d sum.exe/sum.o`
+   例如图中所指向的那一条即表示 PC：
 
-或者在gdb中：`disas phase_1`
+   ![image-20250913085706316](https://houlir2.dpdns.org/2025/09/2ae2fb8aa3c7853179c2b3ba8003c0bb.png)
 
-> 反汇编代码没有很多伪指令（.开头），而 	 	
+2. **控制器（Control Unit，CU）：协调计算机各组件工作，解析指令（比如识别 “这是加法还是减法”），并向其他部件（如 ALU、内存）发送控制信号。**
+
+3. 缓存（Cache）：CPU 与内存之间的 “高速缓冲存储器”，存放 CPU 最近常用的指令和数据（因为 Cache 速度比内存快，比寄存器容量大）。
+
+4. **指令寄存器（Instruction Register，IR）**：**存放CPU当前正在“解析和执行”的指令**（从内存取出后先存在IR）
+
+**阶段 2：解析指令（控制器 + IR）**
+
+**阶段 3：准备并执行运算（寄存器 + 数据通路 + ALU + 时钟）**
+
+1. 数据通路（Data Path）：CPU 内部 “数据传输的高速公路”，连接寄存器、ALU、控制器，负责数据在组件间流动。
+2. 寄存器（Register）：CPU 内部的 “高速临时存储器”，用于存放当前正在处理的数据、指令地址或状态。
+3. 算术逻辑单元（Arithmetic Logic Unit，ALU）：执行所有算术（加、减）和逻辑（与、或）运算
+4. 时钟信号（Clock）：由 “时钟发生器” 产生的周期性脉冲，同步 CPU 所有操作（取指令、运算、存结果必须按 “节拍” 走）。
+
+**阶段 4：写回结果（寄存器 + 数据通路）**
+
+1. 主存储器（Main Memory，内存）：临时存储正在运行的程序（指令）和数据，CPU 通过地址访问。
+2. 总线（Bus）：连接计算机各组件（CPU、内存、硬盘等）的 “数据传输通道”，分地址总线（传地址）、数据总线（传数据）、控制总线（传控制信号）。
 
 ### GDB调试
 
@@ -1720,6 +1638,30 @@ CPU 包含一组 **16 个**存储 64 位值的通用目的**寄存器。这些�
 
    ![image-20250827092113233](https://houlir2.dpdns.org/2025/08/24f08d4736b076e789586641b33bdaba.png)
 
+### 反汇编器
+
+`objdump -d sum.exe/sum.o`
+
+或者在gdb中：`disas phase_1`
+
+> 反汇编代码没有很多伪指令（.开头），而汇编代码会有很多，这是一个很明显的区别
+
+![image-20250913092807111](https://houlir2.dpdns.org/2025/09/d4969bcc4961659f80d9900e8a2cea2a.png)
+
+可以发现：
+
+1. 第一个表格是汇编代码，会包含 `.` 开头的代码，也可以发现**不管是汇编代码还是反汇编代码，其内存地址总是是由低到高走的**
+
+2. 第二个表格是反汇编代码：
+
+   1. **第一列表示的是指令的偏移地址**，如果链接后，就会变为具体的地址，例如：
+
+      ![image-20250913101538098](https://houlir2.dpdns.org/2025/09/93ecfe1943b732885bb93d93cb966daf.png)
+
+   2. **第二列是指令对应的机器码**，可以发现，的确内存地址是由低到高的
+
+   3. 第二列机器码的后几个字节，为指令的目标编码，一般是最后一个字节（三个字节以内）
+
 #### mov操作
 
 1. `movq Source, Dest`
@@ -1810,7 +1752,7 @@ CPU 包含一组 **16 个**存储 64 位值的通用目的**寄存器。这些�
 > **能够设置条件码的只有两个指令：CMP和TEST**
 >
 > 1. **cmp就是sub指令，但不会改变源的结果，只会根据结果而返回对应的状态码**
-> 2. t**est指令同样的是and指令**，不会改变源结果
+> 2. **test指令同样的是and（逻辑与）指令**，不会改变源结果
 >
 > leaq指令不会影响条件码，只是地址的计算
 
@@ -1830,14 +1772,93 @@ CPU 包含一组 **16 个**存储 64 位值的通用目的**寄存器。这些�
 
 
 
-#### jump
+#### 跳转指令
 
 跳转分为直接跳转和间接跳转
 
 1. **直接跳转**：以 一个标号作为目标，如`jmp .L!`
 2. **间接跳转**：以 `*` + 一个操作数，如`jmp *(%rax)`
 
+> 就类似于指针引用吧
+
 ![image-20250912145808286](https://houlir2.dpdns.org/2025/09/157bdc75efe51157a1247ca943bb4119.png)
+
+#### 跳转指令的编码
+
+共有两种编码形式：
+
+1. **最常用的是“PC相对的（PC-relative）”，类似于相对地址一样**：将 jump 跳转到的目标指令地址与紧跟在该 jump 后面那条指令的偏移地址的差作为目标编码（一般是机器码最后一个字节），即
+
+   `目标编码 = jump的目标指令地址 - jump下一条指令的偏移地址`
+
+   或者是
+
+   `偏移量 = 目标地址 - PC值`
+
+2. 绝对地址的方式，用4个字节直接指定目标，例如：
+
+   `jump *0x402000`
+
+   > **使用绝对地址的方式，在链接后的反汇编代码中，jump的跳转目标编码是需要变的；而如果用相对地址，就不会变化**
+
+
+
+
+
+**跳转指令的汇编代码是通过“反向条件语句来跳转”**，即如果符合反向的条件则跳转到对应内容去执行（一般是else或者if不成立的情况），否则，就顺序执行（对应的是if语句内容）
+
+#### 用条件传送来实现条件分支
+
+原本的条件分支是通过控制的方式实现的，十分的低效。
+
+另一种高效的策略是数据的条件转移：即计算两种结果值，根据条件而选择其中一个结果，如：
+
+![image-20250913160825446](https://houlir2.dpdns.org/2025/09/dc807e87979375aa10f9c8b674c188d8.png)
+
+条件传送的指令为：cmov（conditional move）
+
+![image-20250913160955592](https://houlir2.dpdns.org/2025/09/07b13ddaee20ce0c0dbaa20a96354321.png)
+
+### 循环语句
+
+**if 语句的条件跳转通常是 “往下跳”，而循环的跳转通常是 “往上跳”**
+
+两种翻译方式：
+
+1. 跳转到中间（jump to middle）
+
+   ![image-20250913164654583](https://houlir2.dpdns.org/2025/09/03f223e591d8f21b460d0ad94e9b2140.png)
+
+2. guarded-do, 首先用条件分支，如果初始条件不成立就
+   跳过循环，把代码变换为 do-while 循环。当使用较高优化等级编译时，例如使用命令行选项 -01, GCC 会采用这种策略
+
+   > 核心是：**用一个 “守卫条件（Guarding Condition）” 控制循环（或命令）的执行**—— 只有当条件满足时，循环（或命令）才会执行。
+
+   ![image-20250913165829550](https://houlir2.dpdns.org/2025/09/e77120186586490b8c148caa261eaab1.png)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 # **Vim 常见命令表格**
 
