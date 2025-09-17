@@ -443,21 +443,21 @@ Disassembly of section .text:
 
 000000000040100c <phase_4>:
   40100c:       48 83 ec 18             sub    $0x18,%rsp
-  401010:       48 8d 4c 24 0c          lea    0xc(%rsp),%rcx 
-  401015:       48 8d 54 24 08          lea    0x8(%rsp),%rdx
-  40101a:       be cf 25 40 00          mov    $0x4025cf,%esi
-  40101f:       b8 00 00 00 00          mov    $0x0,%eax
+  401010:       48 8d 4c 24 0c          lea    0xc(%rsp),%rcx # 参数2
+  401015:       48 8d 54 24 08          lea    0x8(%rsp),%rdx # 参数1
+  40101a:       be cf 25 40 00          mov    $0x4025cf,%esi  # "%d %d"
+  40101f:       b8 00 00 00 00          mov    $0x0,%eax # eax = 0
   401024:       e8 c7 fb ff ff          call   400bf0 <__isoc99_sscanf@plt>
-  401029:       83 f8 02                cmp    $0x2,%eax
+  401029:       83 f8 02                cmp    $0x2,%eax # 需要等于2，否则爆炸
   40102c:       75 07                   jne    401035 <phase_4+0x29>
-  40102e:       83 7c 24 08 0e          cmpl   $0xe,0x8(%rsp)  #
+  40102e:       83 7c 24 08 0e          cmpl   $0xe,0x8(%rsp)  # 参数1 需要<=14
   401033:       76 05                   jbe    40103a <phase_4+0x2e>
   401035:       e8 00 04 00 00          call   40143a <explode_bomb>
   40103a:       ba 0e 00 00 00          mov    $0xe,%edx  # edx = 14
   40103f:       be 00 00 00 00          mov    $0x0,%esi # esi = 0
-  401044:       8b 7c 24 08             mov    0x8(%rsp),%edi
+  401044:       8b 7c 24 08             mov    0x8(%rsp),%edi # edi = 参数1
   401048:       e8 81 ff ff ff          call   400fce <func4>
-  40104d:       85 c0                   test   %eax,%eax # 需要==0
+  40104d:       85 c0                   test   %eax,%eax # 需要==0，这里第一个参数7通过了
   40104f:       75 07                   jne    401058 <phase_4+0x4c>
   401051:       83 7c 24 0c 00          cmpl   $0x0,0xc(%rsp)  
   401056:       74 05                   je     40105d <phase_4+0x51>
@@ -467,37 +467,39 @@ Disassembly of section .text:
 
 0000000000401062 <phase_5>:
   401062:       53                      push   %rbx
-  401063:       48 83 ec 20             sub    $0x20,%rsp
-  401067:       48 89 fb                mov    %rdi,%rbx
+  401063:       48 83 ec 20             sub    $0x20,%rsp  # 栈指针占8字节，参数占24字节
+  401067:       48 89 fb                mov    %rdi,%rbx  # rbx = 第一个参数
   40106a:       64 48 8b 04 25 28 00    mov    %fs:0x28,%rax
   401071:       00 00
   401073:       48 89 44 24 18          mov    %rax,0x18(%rsp)
   401078:       31 c0                   xor    %eax,%eax
-  40107a:       e8 9c 02 00 00          call   40131b <string_length>
+  40107a:       e8 9c 02 00 00          call   40131b <string_length>  # 六个长度的字符串
   40107f:       83 f8 06                cmp    $0x6,%eax
-  401082:       74 4e                   je     4010d2 <phase_5+0x70>
+  401082:       74 4e                   je     4010d2 <phase_5+0x70> # 第一次跳转
   401084:       e8 b1 03 00 00          call   40143a <explode_bomb>
   401089:       eb 47                   jmp    4010d2 <phase_5+0x70>
-  40108b:       0f b6 0c 03             movzbl (%rbx,%rax,1),%ecx
-  40108f:       88 0c 24                mov    %cl,(%rsp)
+
+  40108b:       0f b6 0c 03             movzbl (%rbx,%rax,1),%ecx  # 移动我输入的字符串
+  40108f:       88 0c 24                mov    %cl,(%rsp)  # 这里是121，不知道咋来的
   401092:       48 8b 14 24             mov    (%rsp),%rdx
-  401096:       83 e2 0f                and    $0xf,%edx
+  401096:       83 e2 0f                and    $0xf,%edx  # 二进制的与运算
   401099:       0f b6 92 b0 24 40 00    movzbl 0x4024b0(%rdx),%edx
   4010a0:       88 54 04 10             mov    %dl,0x10(%rsp,%rax,1)
-  4010a4:       48 83 c0 01             add    $0x1,%rax
-  4010a8:       48 83 f8 06             cmp    $0x6,%rax
+  4010a4:       48 83 c0 01             add    $0x1,%rax  # rax++
+  4010a8:       48 83 f8 06             cmp    $0x6,%rax  # 这里相当于6次循环？
   4010ac:       75 dd                   jne    40108b <phase_5+0x29>
+
   4010ae:       c6 44 24 16 00          movb   $0x0,0x16(%rsp)
-  4010b3:       be 5e 24 40 00          mov    $0x40245e,%esi
-  4010b8:       48 8d 7c 24 10          lea    0x10(%rsp),%rdi
-  4010bd:       e8 76 02 00 00          call   401338 <strings_not_equal>
-  4010c2:       85 c0                   test   %eax,%eax
+  4010b3:       be 5e 24 40 00          mov    $0x40245e,%esi  # flyers
+  4010b8:       48 8d 7c 24 10          lea    0x10(%rsp),%rdi  # 这里是每道题的答案，问题是每次六轮循环得到的结果是不同的，得破解一下
+  4010bd:       e8 76 02 00 00          call   401338 <strings_not_equal>  # 这里是关键，不相等（结果为0）就爆炸
+  4010c2:       85 c0                   test   %eax,%eax  # 0 就炸
   4010c4:       74 13                   je     4010d9 <phase_5+0x77>
   4010c6:       e8 6f 03 00 00          call   40143a <explode_bomb>
   4010cb:       0f 1f 44 00 00          nopl   0x0(%rax,%rax,1)
   4010d0:       eb 07                   jmp    4010d9 <phase_5+0x77>
-  4010d2:       b8 00 00 00 00          mov    $0x0,%eax
-  4010d7:       eb b2                   jmp    40108b <phase_5+0x29>
+  4010d2:       b8 00 00 00 00          mov    $0x0,%eax # eax = 0
+  4010d7:       eb b2                   jmp    40108b <phase_5+0x29>  # 第二次跳转
   4010d9:       48 8b 44 24 18          mov    0x18(%rsp),%rax
   4010de:       64 48 33 04 25 28 00    xor    %fs:0x28,%rax
   4010e5:       00 00
