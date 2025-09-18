@@ -479,19 +479,19 @@ Disassembly of section .text:
   401084:       e8 b1 03 00 00          call   40143a <explode_bomb>
   401089:       eb 47                   jmp    4010d2 <phase_5+0x70>
 
-  40108b:       0f b6 0c 03             movzbl (%rbx,%rax,1),%ecx  # 移动我输入的字符串
+  40108b:       0f b6 0c 03             movzbl (%rbx,%rax,1),%ecx  # 移动我输入的字符串，每次左侧减少一个字符
   40108f:       88 0c 24                mov    %cl,(%rsp)  # 这里是121，不知道咋来的
   401092:       48 8b 14 24             mov    (%rsp),%rdx
-  401096:       83 e2 0f                and    $0xf,%edx  # 二进制的与运算
-  401099:       0f b6 92 b0 24 40 00    movzbl 0x4024b0(%rdx),%edx
+  401096:       83 e2 0f                and    $0xf,%edx  # 二进制的与运算，这里根据与运算，生成对应的6个字符，并且每次输入不同得到的结果也不同，关键是要破译这里
+  401099:       0f b6 92 b0 24 40 00    movzbl 0x4024b0(%rdx),%edx  # 得出15个字符任选：maduiersnfotvbyl，那么，答案就是找到原字符经过翻译后得到flyers目标字符的原字符
   4010a0:       88 54 04 10             mov    %dl,0x10(%rsp,%rax,1)
   4010a4:       48 83 c0 01             add    $0x1,%rax  # rax++
   4010a8:       48 83 f8 06             cmp    $0x6,%rax  # 这里相当于6次循环？
   4010ac:       75 dd                   jne    40108b <phase_5+0x29>
 
   4010ae:       c6 44 24 16 00          movb   $0x0,0x16(%rsp)
-  4010b3:       be 5e 24 40 00          mov    $0x40245e,%esi  # flyers
-  4010b8:       48 8d 7c 24 10          lea    0x10(%rsp),%rdi  # 这里是每道题的答案，问题是每次六轮循环得到的结果是不同的，得破解一下
+  4010b3:       be 5e 24 40 00          mov    $0x40245e,%esi  # flyers，最终得到原字符是ionefg
+  4010b8:       48 8d 7c 24 10          lea    0x10(%rsp),%rdi
   4010bd:       e8 76 02 00 00          call   401338 <strings_not_equal>  # 这里是关键，不相等（结果为0）就爆炸
   4010c2:       85 c0                   test   %eax,%eax  # 0 就炸
   4010c4:       74 13                   je     4010d9 <phase_5+0x77>
@@ -510,7 +510,7 @@ Disassembly of section .text:
   4010f3:       c3                      ret
 
 00000000004010f4 <phase_6>:
-  4010f4:       41 56                   push   %r14
+  4010f4:       41 56                   push   %r14  # 一堆被调用者保存寄存器
   4010f6:       41 55                   push   %r13
   4010f8:       41 54                   push   %r12
   4010fa:       55                      push   %rbp
