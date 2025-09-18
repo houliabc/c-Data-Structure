@@ -518,29 +518,32 @@ Disassembly of section .text:
   4010fc:       48 83 ec 50             sub    $0x50,%rsp
   401100:       49 89 e5                mov    %rsp,%r13
   401103:       48 89 e6                mov    %rsp,%rsi
-  401106:       e8 51 03 00 00          call   40145c <read_six_numbers>
+  401106:       e8 51 03 00 00          call   40145c <read_six_numbers>  # 看来又是六个数字
   40110b:       49 89 e6                mov    %rsp,%r14
   40110e:       41 bc 00 00 00 00       mov    $0x0,%r12d
+
   401114:       4c 89 ed                mov    %r13,%rbp
   401117:       41 8b 45 00             mov    0x0(%r13),%eax
   40111b:       83 e8 01                sub    $0x1,%eax
-  40111e:       83 f8 05                cmp    $0x5,%eax
-  401121:       76 05                   jbe    401128 <phase_6+0x34>
+  40111e:       83 f8 05                cmp    $0x5,%eax  # 第一个参数要<=6
+  401121:       76 05                   jbe    401128 <phase_6+0x34> # 第一次跳转，>就爆炸
   401123:       e8 12 03 00 00          call   40143a <explode_bomb>
-  401128:       41 83 c4 01             add    $0x1,%r12d
-  40112c:       41 83 fc 06             cmp    $0x6,%r12d
-  401130:       74 21                   je     401153 <phase_6+0x5f>
+  401128:       41 83 c4 01             add    $0x1,%r12d # r12++
+  40112c:       41 83 fc 06             cmp    $0x6,%r12d # 判断是否等于6，有点像循环了
+  401130:       74 21                   je     401153 <phase_6+0x5f>  # 相等就第二次跳转，这里必须跳转才能走出去
   401132:       44 89 e3                mov    %r12d,%ebx
-  401135:       48 63 c3                movslq %ebx,%rax
+
+  401135:       48 63 c3                movslq %ebx,%rax  # 这里循环，每次ebx++
   401138:       8b 04 84                mov    (%rsp,%rax,4),%eax
   40113b:       39 45 00                cmp    %eax,0x0(%rbp)
-  40113e:       75 05                   jne    401145 <phase_6+0x51>
+  40113e:       75 05                   jne    401145 <phase_6+0x51>  # 这里相等就炸，也就是结果不能是第一个参数
   401140:       e8 f5 02 00 00          call   40143a <explode_bomb>
-  401145:       83 c3 01                add    $0x1,%ebx
+  401145:       83 c3 01                add    $0x1,%ebx # ebx++
   401148:       83 fb 05                cmp    $0x5,%ebx
-  40114b:       7e e8                   jle    401135 <phase_6+0x41>
+  40114b:       7e e8                   jle    401135 <phase_6+0x41>  # 当<=5就循环
   40114d:       49 83 c5 04             add    $0x4,%r13
-  401151:       eb c1                   jmp    401114 <phase_6+0x20>
+  401151:       eb c1                   jmp    401114 <phase_6+0x20>  # 跳回前头，有点类似循环
+
   401153:       48 8d 74 24 18          lea    0x18(%rsp),%rsi
   401158:       4c 89 f0                mov    %r14,%rax
   40115b:       b9 07 00 00 00          mov    $0x7,%ecx
