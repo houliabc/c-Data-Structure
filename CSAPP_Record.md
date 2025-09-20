@@ -1156,3 +1156,82 @@ int main(void) {
 
 代码已上传github[深入理解计算机系统第三版第二章作业题答案](https://github.com/agelessman/csapp-3e-solutions/tree/master/第二章答案)
 如有错误之处，还请指正啊。。。
+
+# 第三章bomb
+
+## phase_1
+
+这题考察了examine（x）命令的使用、test以及跳转
+
+```asm
+0000000000400ee0 <phase_1>:
+  400ee0:       48 83 ec 08             sub    $0x8,%rsp  # 开辟栈
+  400ee4:       be 00 24 40 00          mov    $0x402400,%esi  # 用“x/s 0x402400查看该地址的值”
+  400ee9:       e8 4a 04 00 00          call   401338 <strings_not_equal> 
+  400eee:       85 c0                   test   %eax,%eax # 判断结果是否为0（表示和题目字符串相同）
+  400ef0:       74 05                   je     400ef7 <phase_1+0x17> 
+  400ef2:       e8 43 05 00 00          call   40143a <explode_bomb>  # 不相同就爆炸
+  400ef7:       48 83 c4 08             add    $0x8,%rsp
+  400efb:       c3                      ret
+```
+
+## phase_2
+
+这题考察了循环和if，主要是根据不断的跳转，找到一个规律，最后得出答案
+
+```asm
+0000000000400efc <phase_2>:
+  400efc:       55                      push   %rbp
+  400efd:       53                      push   %rbx
+  400efe:       48 83 ec 28             sub    $0x28,%rsp  # 40
+  400f02:       48 89 e6                mov    %rsp,%rsi
+  400f05:       e8 52 05 00 00          call   40145c <read_six_numbers>  # 从这得知读入六个数，也就是输入的值应该是六个数，用空格分开
+  400f0a:       83 3c 24 01             cmpl   $0x1,(%rsp)  # 第一个比较是1
+  400f0e:       74 20                   je     400f30 <phase_2+0x34>  # 第一次跳
+  400f10:       e8 25 05 00 00          call   40143a <explode_bomb>
+  400f15:       eb 19                   jmp    400f30 <phase_2+0x34>
+  400f17:       8b 43 fc                mov    -0x4(%rbx),%eax  # 第一个数移动；第三个数移动；第四
+  400f1a:       01 c0                   add    %eax,%eax # 这里得到2；得到4；得到8（从这里就知道规律了，每次都是上一个数相加，也就知道最后的答案了）
+  400f1c:       39 03                   cmp    %eax,(%rbx)  # 记得现在rbx是第二个数，和刚刚的2比较
+  400f1e:       74 05                   je     400f25 <phase_2+0x29>  # 第三次跳；第五次跳
+  400f20:       e8 15 05 00 00          call   40143a <explode_bomb>
+  400f25:       48 83 c3 04             add    $0x4,%rbx  # rbx现在是第三个数；第四个数
+  400f29:       48 39 eb                cmp    %rbp,%rbx  # 按理应该不想等
+  400f2c:       75 e9                   jne    400f17 <phase_2+0x1b>  # 第四次跳；第六次跳
+  400f2e:       eb 0c                   jmp    400f3c <phase_2+0x40>
+  400f30:       48 8d 5c 24 04          lea    0x4(%rsp),%rbx  # rbp指向栈底，rbx指向第二个数，这里是被调用者保存寄存器
+  400f35:       48 8d 6c 24 18          lea    0x18(%rsp),%rbp
+  400f3a:       eb db                   jmp    400f17 <phase_2+0x1b> # 第二次跳
+  400f3c:       48 83 c4 28             add    $0x28,%rsp
+  400f40:       5b                      pop    %rbx
+  400f41:       5d                      pop    %rbp
+  400f42:       c3                      ret
+```
+
+## phase_3
+
+```asm
+```
+
+
+
+## phase_4
+
+```asm
+
+```
+
+
+
+## phase_5
+
+```asm
+
+```
+
+## phase_6
+
+```asm
+
+```
+

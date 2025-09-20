@@ -343,12 +343,12 @@ Disassembly of section .text:
   400edf:       90                      nop
 
 0000000000400ee0 <phase_1>:
-  400ee0:       48 83 ec 08             sub    $0x8,%rsp
-  400ee4:       be 00 24 40 00          mov    $0x402400,%esi
-  400ee9:       e8 4a 04 00 00          call   401338 <strings_not_equal>
-  400eee:       85 c0                   test   %eax,%eax
-  400ef0:       74 05                   je     400ef7 <phase_1+0x17>
-  400ef2:       e8 43 05 00 00          call   40143a <explode_bomb>
+  400ee0:       48 83 ec 08             sub    $0x8,%rsp  # 开辟栈
+  400ee4:       be 00 24 40 00          mov    $0x402400,%esi  # 用“x/s 0x402400查看该地址的值”
+  400ee9:       e8 4a 04 00 00          call   401338 <strings_not_equal> 
+  400eee:       85 c0                   test   %eax,%eax # 判断结果是否为0（表示和题目字符串相同）
+  400ef0:       74 05                   je     400ef7 <phase_1+0x17> 
+  400ef2:       e8 43 05 00 00          call   40143a <explode_bomb>  # 不相同就爆炸
   400ef7:       48 83 c4 08             add    $0x8,%rsp
   400efb:       c3                      ret
 
@@ -357,13 +357,13 @@ Disassembly of section .text:
   400efd:       53                      push   %rbx
   400efe:       48 83 ec 28             sub    $0x28,%rsp  # 40
   400f02:       48 89 e6                mov    %rsp,%rsi
-  400f05:       e8 52 05 00 00          call   40145c <read_six_numbers>
+  400f05:       e8 52 05 00 00          call   40145c <read_six_numbers>  # 从这得知读入六个数，也就是输入的值应该是六个数，用空格分开
   400f0a:       83 3c 24 01             cmpl   $0x1,(%rsp)  # 第一个比较是1
   400f0e:       74 20                   je     400f30 <phase_2+0x34>  # 第一次跳
   400f10:       e8 25 05 00 00          call   40143a <explode_bomb>
   400f15:       eb 19                   jmp    400f30 <phase_2+0x34>
   400f17:       8b 43 fc                mov    -0x4(%rbx),%eax  # 第一个数移动；第三个数移动；第四
-  400f1a:       01 c0                   add    %eax,%eax # 这里得到2；得到4；得到8（从这里就知道规律了，每次都是上一个数相加）
+  400f1a:       01 c0                   add    %eax,%eax # 这里得到2；得到4；得到8（从这里就知道规律了，每次都是上一个数相加，也就知道最后的答案了）
   400f1c:       39 03                   cmp    %eax,(%rbx)  # 记得现在rbx是第二个数，和刚刚的2比较
   400f1e:       74 05                   je     400f25 <phase_2+0x29>  # 第三次跳；第五次跳
   400f20:       e8 15 05 00 00          call   40143a <explode_bomb>
@@ -520,22 +520,25 @@ Disassembly of section .text:
   401103:       48 89 e6                mov    %rsp,%rsi
   401106:       e8 51 03 00 00          call   40145c <read_six_numbers>  # 看来又是六个数字
   40110b:       49 89 e6                mov    %rsp,%r14
-  40110e:       41 bc 00 00 00 00       mov    $0x0,%r12d
+  40110e:       41 bc 00 00 00 00       mov    $0x0,%r12d  # 经过推演得出，r12表示的当前校验的是第几个参数（不是参数值），也就是要对这六个参数进行一系列的校验
 
-  401114:       4c 89 ed                mov    %r13,%rbp
-  401117:       41 8b 45 00             mov    0x0(%r13),%eax
-  40111b:       83 e8 01                sub    $0x1,%eax
+
+
+# 终于理清这里的一系列关系了，大致就是要求这六个参数不能有相同的，且不能> 6
+  401114:       4c 89 ed                mov    %r13,%rbp  # rbp 保存的是第几个参数
+  401117:       41 8b 45 00             mov    0x0(%r13),%eax  # 表示从第几个参数开始到6的数字（用于循环）
+  40111b:       83 e8 01                sub    $0x1,%eax  # eax第一个参数--
   40111e:       83 f8 05                cmp    $0x5,%eax  # 第一个参数要<=6
   401121:       76 05                   jbe    401128 <phase_6+0x34> # 第一次跳转，>就爆炸
   401123:       e8 12 03 00 00          call   40143a <explode_bomb>
-  401128:       41 83 c4 01             add    $0x1,%r12d # r12++
-  40112c:       41 83 fc 06             cmp    $0x6,%r12d # 判断是否等于6，有点像循环了
-  401130:       74 21                   je     401153 <phase_6+0x5f>  # 相等就第二次跳转，这里必须跳转才能走出去
-  401132:       44 89 e3                mov    %r12d,%ebx
+  401128:       41 83 c4 01             add    $0x1,%r12d # r12++，从0开始
+  40112c:       41 83 fc 06             cmp    $0x6,%r12d # 判断是否等于6，这里是循环
+  401130:       74 21                   je     401153 <phase_6+0x5f>  # ！！！相等就第二次跳转，这里必须执行六次才出去
+  401132:       44 89 e3                mov    %r12d,%ebx  # ebx = r12
 
-  401135:       48 63 c3                movslq %ebx,%rax  # 这里循环，每次ebx++
+  401135:       48 63 c3                movslq %ebx,%rax  # 这里循环，ebx就是上面r12
   401138:       8b 04 84                mov    (%rsp,%rax,4),%eax
-  40113b:       39 45 00                cmp    %eax,0x0(%rbp)
+  40113b:       39 45 00                cmp    %eax,0x0(%rbp)  # 像参数一比参数二
   40113e:       75 05                   jne    401145 <phase_6+0x51>  # 这里相等就炸，也就是结果不能是第一个参数
   401140:       e8 f5 02 00 00          call   40143a <explode_bomb>
   401145:       83 c3 01                add    $0x1,%ebx # ebx++
@@ -544,55 +547,80 @@ Disassembly of section .text:
   40114d:       49 83 c5 04             add    $0x4,%r13
   401151:       eb c1                   jmp    401114 <phase_6+0x20>  # 跳回前头，有点类似循环
 
-  401153:       48 8d 74 24 18          lea    0x18(%rsp),%rsi
-  401158:       4c 89 f0                mov    %r14,%rax
-  40115b:       b9 07 00 00 00          mov    $0x7,%ecx
-  401160:       89 ca                   mov    %ecx,%edx
-  401162:       2b 10                   sub    (%rax),%edx
-  401164:       89 10                   mov    %edx,(%rax)
-  401166:       48 83 c0 04             add    $0x4,%rax
-  40116a:       48 39 f0                cmp    %rsi,%rax
-  40116d:       75 f1                   jne    401160 <phase_6+0x6c>
-  40116f:       be 00 00 00 00          mov    $0x0,%esi
+
+
+# 这一轮操作像是把规定了六个参数的下限，现在的范围为>=1，且没有相同的
+# 这里是将传递的参数每个用7-参数值，存放在栈中，例如参数一是3，那么栈中存放4
+  401153:       48 8d 74 24 18          lea    0x18(%rsp),%rsi  # rsi = 0；%rsi = rsp+24也就是要循环六次
+  401158:       4c 89 f0                mov    %r14,%rax  # %rax = 参数一
+  40115b:       b9 07 00 00 00          mov    $0x7,%ecx  # ecx = 7
+
+  401160:       89 ca                   mov    %ecx,%edx # edx = ecx = 7
+  401162:       2b 10                   sub    (%rax),%edx # edx = 7 - 参数一
+  401164:       89 10                   mov    %edx,(%rax) # rsp = rax = 7 - 参数一
+  401166:       48 83 c0 04             add    $0x4,%rax # rax = 参数二
+  40116a:       48 39 f0                cmp    %rsi,%rax  # 要求参数二到参数六不能为0
+  40116d:       75 f1                   jne    401160 <phase_6+0x6c> # 7 != 5（参数二）
+
+
+  # 执行六次后跳出循环
+  40116f:       be 00 00 00 00          mov    $0x0,%esi # rsi = 0
   401174:       eb 21                   jmp    401197 <phase_6+0xa3>
-  401176:       48 8b 52 08             mov    0x8(%rdx),%rdx
-  40117a:       83 c0 01                add    $0x1,%eax
+
+  401176:       48 8b 52 08             mov    0x8(%rdx),%rdx # rdx = node2
+  40117a:       83 c0 01                add    $0x1,%eax # eax++，又开始循环了。2，3,4,5
   40117d:       39 c8                   cmp    %ecx,%eax
-  40117f:       75 f5                   jne    401176 <phase_6+0x82>
+  40117f:       75 f5                   jne    401176 <phase_6+0x82>  # ecx != 参数二就重复执行这一段
+
+
+# 这里是要求任意其中一个参数-7后都要<=1
   401181:       eb 05                   jmp    401188 <phase_6+0x94>
-  401183:       ba d0 32 60 00          mov    $0x6032d0,%edx
+  401183:       ba d0 32 60 00          mov    $0x6032d0,%edx  # edx = node1
   401188:       48 89 54 74 20          mov    %rdx,0x20(%rsp,%rsi,2)
-  40118d:       48 83 c6 04             add    $0x4,%rsi
-  401191:       48 83 fe 18             cmp    $0x18,%rsi
-  401195:       74 14                   je     4011ab <phase_6+0xb7>
-  401197:       8b 0c 34                mov    (%rsp,%rsi,1),%ecx
+  40118d:       48 83 c6 04             add    $0x4,%rsi # rsi = 4
+  401191:       48 83 fe 18             cmp    $0x18,%rsi  
+  401195:       74 14                   je     4011ab <phase_6+0xb7>  # ！！！ rsi == 24 就跳出循环，共执行六轮
+  401197:       8b 0c 34                mov    (%rsp,%rsi,1),%ecx # ecx = node1,2...6
   40119a:       83 f9 01                cmp    $0x1,%ecx
-  40119d:       7e e4                   jle    401183 <phase_6+0x8f>
-  40119f:       b8 01 00 00 00          mov    $0x1,%eax
-  4011a4:       ba d0 32 60 00          mov    $0x6032d0,%edx
+  40119d:       7e e4                   jle    401183 <phase_6+0x8f> # ecx <= 1 就上跳，任意其中一个参数-7后都要<=1
+  40119f:       b8 01 00 00 00          mov    $0x1,%eax # eax = 1
+  4011a4:       ba d0 32 60 00          mov    $0x6032d0,%edx # edx = node1
   4011a9:       eb cb                   jmp    401176 <phase_6+0x82>
-  4011ab:       48 8b 5c 24 20          mov    0x20(%rsp),%rbx
-  4011b0:       48 8d 44 24 28          lea    0x28(%rsp),%rax
-  4011b5:       48 8d 74 24 50          lea    0x50(%rsp),%rsi
-  4011ba:       48 89 d9                mov    %rbx,%rcx
-  4011bd:       48 8b 10                mov    (%rax),%rdx
-  4011c0:       48 89 51 08             mov    %rdx,0x8(%rcx)
-  4011c4:       48 83 c0 08             add    $0x8,%rax
+
+; x/96h 0x6032d0
+; 0x6032d0 <node1>:       332     0       1       0       13024   96      0       0
+; 0x6032e0 <node2>:       168     0       2       0       13040   96      0       0
+; 0x6032f0 <node3>:       924     0       3       0       13056   96      0       0
+; 0x603300 <node4>:       691     0       4       0       13072   96      0       0
+; 0x603310 <node5>:       477     0       5       0       13088   96      0       0
+; 0x603320 <node6>:       443     0       6       0       0       0       0       0
+
+
+  4011ab:       48 8b 5c 24 20          mov    0x20(%rsp),%rbx # %rbx = 76(L)
+  4011b0:       48 8d 44 24 28          lea    0x28(%rsp),%rax # %rax = -32
+  4011b5:       48 8d 74 24 50          lea    0x50(%rsp),%rsi # %rsi = 120(x)
+  4011ba:       48 89 d9                mov    %rbx,%rcx # %rcx = 76(L)
+
+  4011bd:       48 8b 10                mov    (%rax),%rdx # rdx = -32，-16
+  4011c0:       48 89 51 08             mov    %rdx,0x8(%rcx) 
+  4011c4:       48 83 c0 08             add    $0x8,%rax # $rax = -16
   4011c8:       48 39 f0                cmp    %rsi,%rax
-  4011cb:       74 05                   je     4011d2 <phase_6+0xde>
-  4011cd:       48 89 d1                mov    %rdx,%rcx
+  4011cb:       74 05                   je     4011d2 <phase_6+0xde>  # 相同就跳下去了
+  4011cd:       48 89 d1                mov    %rdx,%rcx # %rcx = -32
   4011d0:       eb eb                   jmp    4011bd <phase_6+0xc9>
+
   4011d2:       48 c7 42 08 00 00 00    movq   $0x0,0x8(%rdx)
   4011d9:       00
-  4011da:       bd 05 00 00 00          mov    $0x5,%ebp
-  4011df:       48 8b 43 08             mov    0x8(%rbx),%rax
-  4011e3:       8b 00                   mov    (%rax),%eax
+  4011da:       bd 05 00 00 00          mov    $0x5,%ebp # %ebp = 5，很显然，这里是五轮循环
+
+  4011df:       48 8b 43 08             mov    0x8(%rbx),%rax  # rbx = 76，-32；rax = 
+  4011e3:       8b 00                   mov    (%rax),%eax  # %eax = 443
   4011e5:       39 03                   cmp    %eax,(%rbx)
-  4011e7:       7d 05                   jge    4011ee <phase_6+0xfa>
+  4011e7:       7d 05                   jge    4011ee <phase_6+0xfa>  # ！！！如果 < 就炸，也就是要五轮都满足 >= 才能结束
   4011e9:       e8 4c 02 00 00          call   40143a <explode_bomb>
-  4011ee:       48 8b 5b 08             mov    0x8(%rbx),%rbx
-  4011f2:       83 ed 01                sub    $0x1,%ebp
-  4011f5:       75 e8                   jne    4011df <phase_6+0xeb>
+  4011ee:       48 8b 5b 08             mov    0x8(%rbx),%rbx # rbx = -32，-88，-16
+  4011f2:       83 ed 01                sub    $0x1,%ebp # ebp--
+  4011f5:       75 e8                   jne    4011df <phase_6+0xeb>  # 不相同就跳回去，
   4011f7:       48 83 c4 50             add    $0x50,%rsp
   4011fb:       5b                      pop    %rbx
   4011fc:       5d                      pop    %rbp
