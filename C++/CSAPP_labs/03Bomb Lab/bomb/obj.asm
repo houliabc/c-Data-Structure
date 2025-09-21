@@ -380,17 +380,17 @@ Disassembly of section .text:
   400f42:       c3                      ret
 
 0000000000400f43 <phase_3>:
-  400f43:       48 83 ec 18             sub    $0x18,%rsp  # rsp - 24得出是六个数字（下面看出一个占4字节）
-  400f47:       48 8d 4c 24 0c          lea    0xc(%rsp),%rcx # (rsp - 12)移到rcx上；第三个数
-  400f4c:       48 8d 54 24 08          lea    0x8(%rsp),%rdx # (rsp - 8)移到rdx上；第二个数
+  400f43:       48 83 ec 18             sub    $0x18,%rsp 看出一个占4字节）
+  400f47:       48 8d 4c 24 0c          lea    0xc(%rsp),%rcx 
+  400f4c:       48 8d 54 24 08          lea    0x8(%rsp),%rdx 
   400f51:       be cf 25 40 00          mov    $0x4025cf,%esi  # 查看了地址，是两个%d
   400f56:       b8 00 00 00 00          mov    $0x0,%eax
   400f5b:       e8 90 fc ff ff          call   400bf0 <__isoc99_sscanf@plt> # 函数scanf的返回值应该是读入进去的个数吧？
-  400f60:       83 f8 01                cmp    $0x1,%eax  # 如果小于两个数就爆炸
+  400f60:       83 f8 01                cmp    $0x1,%eax  # 如果小于两个数就爆炸，说明要输入两个参数，用空格隔开
   400f63:       7f 05                   jg     400f6a <phase_3+0x27>  # 第一次跳
   400f65:       e8 d0 04 00 00          call   40143a <explode_bomb>
   400f6a:       83 7c 24 08 07          cmpl   $0x7,0x8(%rsp)  # 这里是设定switch的范围是1-7，7是相对于减去最小值来实现规格化
-  400f6f:       77 3c                   ja     400fad <phase_3+0x6a> # 第二次跳
+  400f6f:       77 3c                   ja     400fad <phase_3+0x6a> # 如果大于7就爆炸
   400f71:       8b 44 24 08             mov    0x8(%rsp),%eax # 第二个数移动到eax
   400f75:       ff 24 c5 70 24 40 00    jmp    *0x402470(,%rax,8)  # 跳转表，也就是参数1选择在1-7范围，然后对应参数2的每个都不同
   400f7c:       b8 cf 00 00 00          mov    $0xcf,%eax   # case 1
@@ -448,18 +448,18 @@ Disassembly of section .text:
   40101a:       be cf 25 40 00          mov    $0x4025cf,%esi  # "%d %d"
   40101f:       b8 00 00 00 00          mov    $0x0,%eax # eax = 0
   401024:       e8 c7 fb ff ff          call   400bf0 <__isoc99_sscanf@plt>
-  401029:       83 f8 02                cmp    $0x2,%eax # 需要等于2，否则爆炸
+  401029:       83 f8 02                cmp    $0x2,%eax # 需要输入 2 个参数，否则爆炸
   40102c:       75 07                   jne    401035 <phase_4+0x29>
-  40102e:       83 7c 24 08 0e          cmpl   $0xe,0x8(%rsp)  # 参数1 需要<=14
+  40102e:       83 7c 24 08 0e          cmpl   $0xe,0x8(%rsp)  # 参数1 需要<=14，否则爆炸
   401033:       76 05                   jbe    40103a <phase_4+0x2e>
   401035:       e8 00 04 00 00          call   40143a <explode_bomb>
   40103a:       ba 0e 00 00 00          mov    $0xe,%edx  # edx = 14
   40103f:       be 00 00 00 00          mov    $0x0,%esi # esi = 0
   401044:       8b 7c 24 08             mov    0x8(%rsp),%edi # edi = 参数1
-  401048:       e8 81 ff ff ff          call   400fce <func4>
-  40104d:       85 c0                   test   %eax,%eax # 需要==0，这里第一个参数7通过了
+  401048:       e8 81 ff ff ff          call   400fce <func4>  # 返回结果是 rax = 0
+  40104d:       85 c0                   test   %eax,%eax # 需要 == 0，这里我的第一个参数7通过了
   40104f:       75 07                   jne    401058 <phase_4+0x4c>
-  401051:       83 7c 24 0c 00          cmpl   $0x0,0xc(%rsp)  
+  401051:       83 7c 24 0c 00          cmpl   $0x0,0xc(%rsp)    # 参数2 需要==0，否则爆炸
   401056:       74 05                   je     40105d <phase_4+0x51>
   401058:       e8 dd 03 00 00          call   40143a <explode_bomb>
   40105d:       48 83 c4 18             add    $0x18,%rsp
@@ -467,7 +467,7 @@ Disassembly of section .text:
 
 0000000000401062 <phase_5>:
   401062:       53                      push   %rbx
-  401063:       48 83 ec 20             sub    $0x20,%rsp  # 栈指针占8字节，参数占24字节
+  401063:       48 83 ec 20             sub    $0x20,%rsp  
   401067:       48 89 fb                mov    %rdi,%rbx  # rbx = 第一个参数
   40106a:       64 48 8b 04 25 28 00    mov    %fs:0x28,%rax
   401071:       00 00
@@ -480,7 +480,7 @@ Disassembly of section .text:
   401089:       eb 47                   jmp    4010d2 <phase_5+0x70>
 
   40108b:       0f b6 0c 03             movzbl (%rbx,%rax,1),%ecx  # 移动我输入的字符串，每次左侧减少一个字符
-  40108f:       88 0c 24                mov    %cl,(%rsp)  # 这里是121，不知道咋来的
+  40108f:       88 0c 24                mov    %cl,(%rsp) 
   401092:       48 8b 14 24             mov    (%rsp),%rdx
   401096:       83 e2 0f                and    $0xf,%edx  # 二进制的与运算，这里根据与运算，生成对应的6个字符，并且每次输入不同得到的结果也不同，关键是要破译这里
   401099:       0f b6 92 b0 24 40 00    movzbl 0x4024b0(%rdx),%edx  # 得出15个字符任选：maduiersnfotvbyl，那么，答案就是找到原字符经过翻译后得到flyers目标字符的原字符
@@ -524,7 +524,7 @@ Disassembly of section .text:
 
 
 
-# 终于理清这里的一系列关系了，大致就是要求这六个参数不能有相同的，且不能> 6
+# 阶段一：要求这六个参数不能有相同的，且不能> 6
   401114:       4c 89 ed                mov    %r13,%rbp  # rbp 保存的是第几个参数
   401117:       41 8b 45 00             mov    0x0(%r13),%eax  # 表示从第几个参数开始到6的数字（用于循环）
   40111b:       83 e8 01                sub    $0x1,%eax  # eax第一个参数--
@@ -549,8 +549,7 @@ Disassembly of section .text:
 
 
 
-# 这一轮操作像是把规定了六个参数的下限，现在的范围为>=1，且没有相同的
-# 这里是将传递的参数每个用7-参数值，存放在栈中，例如参数一是3，那么栈中存放4
+# 阶段二：将传递的参数每个用7-参数值，存放在栈中，例如参数一是3，那么栈中存放4
   401153:       48 8d 74 24 18          lea    0x18(%rsp),%rsi  # rsi = 0；%rsi = rsp+24也就是要循环六次
   401158:       4c 89 f0                mov    %r14,%rax  # %rax = 参数一
   40115b:       b9 07 00 00 00          mov    $0x7,%ecx  # ecx = 7
@@ -563,7 +562,7 @@ Disassembly of section .text:
   40116d:       75 f1                   jne    401160 <phase_6+0x6c> # 7 != 5（参数二）
 
 
-  # 执行六次后跳出循环
+  # 阶段三：根据7-参数值后得到的新参数，来按顺序生成新的链表，通过node[i]的方式，i 为我输入的参数经过处理得到的新参数
   40116f:       be 00 00 00 00          mov    $0x0,%esi # rsi = 0
   401174:       eb 21                   jmp    401197 <phase_6+0xa3>
 
@@ -572,8 +571,6 @@ Disassembly of section .text:
   40117d:       39 c8                   cmp    %ecx,%eax
   40117f:       75 f5                   jne    401176 <phase_6+0x82>  # ecx != 参数二就重复执行这一段
 
-
-# 这里是要求任意其中一个参数-7后都要<=1
   401181:       eb 05                   jmp    401188 <phase_6+0x94>
   401183:       ba d0 32 60 00          mov    $0x6032d0,%edx  # edx = node1
   401188:       48 89 54 74 20          mov    %rdx,0x20(%rsp,%rsi,2)
@@ -582,11 +579,12 @@ Disassembly of section .text:
   401195:       74 14                   je     4011ab <phase_6+0xb7>  # ！！！ rsi == 24 就跳出循环，共执行六轮
   401197:       8b 0c 34                mov    (%rsp,%rsi,1),%ecx # ecx = node1,2...6
   40119a:       83 f9 01                cmp    $0x1,%ecx
-  40119d:       7e e4                   jle    401183 <phase_6+0x8f> # ecx <= 1 就上跳，任意其中一个参数-7后都要<=1
+  40119d:       7e e4                   jle    401183 <phase_6+0x8f> # ecx <= 1 就上跳，任意其中一个node-7后都要<=1
   40119f:       b8 01 00 00 00          mov    $0x1,%eax # eax = 1
   4011a4:       ba d0 32 60 00          mov    $0x6032d0,%edx # edx = node1
   4011a9:       eb cb                   jmp    401176 <phase_6+0x82>
 
+# 例如，我想使新链表第一个参数是最大值 924 ，那么我应该输入的参数是4，因为 7 - 4 = 3，node3 的值是 924
 ; x/96h 0x6032d0
 ; 0x6032d0 <node1>:       332     0       1       0       13024   96      0       0
 ; 0x6032e0 <node2>:       168     0       2       0       13040   96      0       0
@@ -596,14 +594,15 @@ Disassembly of section .text:
 ; 0x603320 <node6>:       443     0       6       0       0       0       0       0
 
 
-  4011ab:       48 8b 5c 24 20          mov    0x20(%rsp),%rbx # %rbx = 76(L)
-  4011b0:       48 8d 44 24 28          lea    0x28(%rsp),%rax # %rax = -32
-  4011b5:       48 8d 74 24 50          lea    0x50(%rsp),%rsi # %rsi = 120(x)
-  4011ba:       48 89 d9                mov    %rbx,%rcx # %rcx = 76(L)
+# 阶段四：校验生成的链表是否按递减的顺序排列，如果不符合就爆炸
+  4011ab:       48 8b 5c 24 20          mov    0x20(%rsp),%rbx 
+  4011b0:       48 8d 44 24 28          lea    0x28(%rsp),%rax 
+  4011b5:       48 8d 74 24 50          lea    0x50(%rsp),%rsi 
+  4011ba:       48 89 d9                mov    %rbx,%rcx 
 
-  4011bd:       48 8b 10                mov    (%rax),%rdx # rdx = -32，-16
+  4011bd:       48 8b 10                mov    (%rax),%rdx
   4011c0:       48 89 51 08             mov    %rdx,0x8(%rcx) 
-  4011c4:       48 83 c0 08             add    $0x8,%rax # $rax = -16
+  4011c4:       48 83 c0 08             add    $0x8,%rax
   4011c8:       48 39 f0                cmp    %rsi,%rax
   4011cb:       74 05                   je     4011d2 <phase_6+0xde>  # 相同就跳下去了
   4011cd:       48 89 d1                mov    %rdx,%rcx # %rcx = -32
@@ -613,12 +612,12 @@ Disassembly of section .text:
   4011d9:       00
   4011da:       bd 05 00 00 00          mov    $0x5,%ebp # %ebp = 5，很显然，这里是五轮循环
 
-  4011df:       48 8b 43 08             mov    0x8(%rbx),%rax  # rbx = 76，-32；rax = 
-  4011e3:       8b 00                   mov    (%rax),%eax  # %eax = 443
+  4011df:       48 8b 43 08             mov    0x8(%rbx),%rax 
+  4011e3:       8b 00                   mov    (%rax),%eax 
   4011e5:       39 03                   cmp    %eax,(%rbx)
   4011e7:       7d 05                   jge    4011ee <phase_6+0xfa>  # ！！！如果 < 就炸，也就是要五轮都满足 >= 才能结束
   4011e9:       e8 4c 02 00 00          call   40143a <explode_bomb>
-  4011ee:       48 8b 5b 08             mov    0x8(%rbx),%rbx # rbx = -32，-88，-16
+  4011ee:       48 8b 5b 08             mov    0x8(%rbx),%rbx 
   4011f2:       83 ed 01                sub    $0x1,%ebp # ebp--
   4011f5:       75 e8                   jne    4011df <phase_6+0xeb>  # 不相同就跳回去，
   4011f7:       48 83 c4 50             add    $0x50,%rsp
