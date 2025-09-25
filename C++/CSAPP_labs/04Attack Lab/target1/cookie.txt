@@ -1,1 +1,1 @@
-0x59b997fa
+./hex2raw -i ctarget_1.txt | ./ctarget -q
