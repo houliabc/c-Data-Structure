@@ -2078,9 +2078,11 @@ AVX (Advanced Vector Extension , 高级向量扩展）  ，其中包括：
 
 **指令被编码为由一个或多个字节序列组成的二进制格式。一个处理器支持的指令和指令的字节级编码称为它的指令集体系结构 (Instruction-Set Architecture, ISA)**   
 
+## Y86-64 指令集体系结构
 
+![image-20250925134738839](https://houlir2.dpdns.org/2025/09/7b3458dd02bcb1a4fc13c90e2e13630d.png)
 
-
+### 指令编码
 
 
 
