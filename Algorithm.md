@@ -358,8 +358,8 @@ C++ 标准库容器可分为 **序列容器**、**关联容器**、**无序关�
 | 类别             | 包含容器                                                     | 底层实现 / 核心特性                                          | 有序性       | 允许重复元素                                               | 随机访问支持                                                |
 | ---------------- | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------ | ---------------------------------------------------------- | ----------------------------------------------------------- |
 | **序列容器**     | `vector`、`list`、`deque`、`array`(数组）、`forward_list`(单向链表：只能沿一个方向遍历的链表) | 按插入顺序存储，元素位置由插入顺序决定                       | 按插入顺序   | 允许                                                       | `vector`/`deque`/`array` 支持；`list`/`forward_list` 不支持 |
-| **关联容器**     | `set`、`multiset`、`map`、`multimap`                         | 基于红黑树（平衡二叉搜索树），元素按 **键（key）** 自动排序  | 按键**有序** | `multiset`/`multimap` 允许；`set`/`map` 不允许             | 不支持（迭代器仅双向）                                      |
-| **无序关联容器** | `unordered_set`、`unordered_multiset`、`unordered_map`、`unordered_multimap` | 基于哈希表，元素无序存储，通过哈希函数快速访问               | **无序**     | `unordered_multiset`/`unordered_multimap` 允许；其余不允许 | 不支持（迭代器仅前向）                                      |
+| **关联容器**     | `set`、`multiset`、`map`、`multimap`                         | 基于**红黑树**（平衡二叉搜索树），元素按 **键（key）** 自动排序 | 按键**有序** | `multiset`/`multimap` 允许；`set`/`map` 不允许             | 不支持（迭代器仅双向）                                      |
+| **无序关联容器** | `unordered_set`、`unordered_multiset`、`unordered_map`、`unordered_multimap` | 基于**哈希表，元素无序存储**，**通过哈希函数快速访问**       | **无序**     | `unordered_multiset`/`unordered_multimap` 允许；其余不允许 | 不支持（迭代器仅前向）                                      |
 | **容器适配器**   | `stack`、`queue`、`priority_queue`                           | stack、queue默认是用deque容器；**priority_queue默认是用vector容器** | -            | 由底层容器决定                                             | 不支持（仅允许访问特定位置元素）                            |
 
 > 其中，set、map和priority_queue可以有第三个参数来设置谓词（**谓词就是返回值为真或者假的函数**。STL 容器中经常会使用到谓词，用于模板参数）
