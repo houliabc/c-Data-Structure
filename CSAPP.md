@@ -2110,7 +2110,7 @@ AVX (Advanced Vector Extension , 高级向量扩展）  ，其中包括：
 
    **字段 `fn` 指明是某个 整 数 操 作 ( OPq) 、数据传送条件 (cmovXX) 或是分支条件 (jXX)**  
 
-3. **（不一定都有）15 个程序寄存器中每个都有一个相对应的范围在 0 到 0xE 之间的寄存器标识符 (register ID) 。无寄存器也有专门的标识符**
+3. **（可选，不一定都有）15 个程序寄存器中每个都有一个相对应的范围在 0 到 0xE 之间的寄存器标识符 (register ID) 。无寄存器也有专门的标识符**
 
    ![image-20250926144012038](https://houlir2.dpdns.org/2025/09/05aea0f51a1eadb88e4b075d7d683b73.png)
 
@@ -2129,6 +2129,8 @@ AVX (Advanced Vector Extension , 高级向量扩展）  ，其中包括：
 ![image-20250926144540475](https://houlir2.dpdns.org/2025/09/c3b4dfb2abe134ecbbd8e321404b2987.png)
 
 ### 异常
+
+[图4-1](##Y86-64 指令集体系结构)
 
 对应含义如下：
 
@@ -2163,7 +2165,7 @@ AVX (Advanced Vector Extension , 高级向量扩展）  ，其中包括：
 
 1. **时钟寄存器（简称寄存器）存储单个位或字**。时钟信号控制寄存器加载输入值。
 
-   Y86-64 处理器会用时钟寄存器保存程序计数器(PC) 、条件代码 CCC) 和程序状态 (Stat)   
+   ===Y86-64 处理器会用**时钟寄存器保存程序计数器(PC) 、条件代码 CCC) 和程序状态 (Stat)**   ===
 
    ![image-20250926185210824](https://houlir2.dpdns.org/2025/09/3ab73d4a2cb85aeb8b0a787e79733330.png)
 
@@ -2171,45 +2173,89 @@ AVX (Advanced Vector Extension , 高级向量扩展）  ，其中包括：
 
    1. **处理器的虚拟内存系统**，硬件和操作系统软件结合起来使处理器可以在一个很大的地址空间内访问任意的字； 
 
-   2. **寄存器文件**，在此，寄存器标识符作为地址。
+   2. 指令内存
 
-      寄存器文件有两个读端口 (A 和 B)'，还有一个写端口 (W) 。这样一个多端口随机访问存储器**允许同时进行多个读和写操作**。
+   3. 数据内存
 
-      ![image-20250926185420182](https://houlir2.dpdns.org/2025/09/85d18a1ebb5e5c4857071a6ededc1438.png)
+   4. **寄存器文件——用于“”阶段**，在此，寄存器标识符作为地址。
+   
+      寄存器文件有两个读端口 (A 和 B)，还有一个写端口 (W) 。这样一个多端口随机访问存储器**允许同时进行多个读和写操作**。
+   
+      ![image-20250928082947768](https://houlir2.dpdns.org/2025/09/60149c3baa62ff67321b4a6e8686dd5d.png)
+   
+      向寄存器文件**写入字是由时钟信号控制的**，控制方式类似于将值加载到时钟寄存器  
+   
+      ![image-20250928083009414](https://houlir2.dpdns.org/2025/09/89520b82adac33bebfbec9474a183aea.png)
 
+## Y86的顺序实现
 
+### 处理器顺序执行流程
 
+1. 取址（fetch）
+2. 译码（decode）
+3. 执行（execute）
+4. 访存（memory）
+5. 写回（write back）
+6. 更新PC（PC update）
 
+![image-20250928083835871](https://houlir2.dpdns.org/2025/09/e08cc6ffe286590b97fd5227974c2fd7.png)
 
+示例：
 
+![image-20250928084926989](https://houlir2.dpdns.org/2025/09/57ffcf8ef3cfef177b2871d8d7e65150.png)
 
+![image-20250928085055772](https://houlir2.dpdns.org/2025/09/4e271ff157b4b384b0115ae58dec9843.png)
 
+### SEO 硬件结构
 
+SEQ("sequential" 顺序的）的处理器  
 
+#### 精简和解析
 
+![image-20250928091528068](https://houlir2.dpdns.org/2025/09/529d9d667b3eaf6e03d498c87304f4b0.png)
 
+![image-20250928091541098](https://houlir2.dpdns.org/2025/09/59251f5bc5cea1b732abc4582249e0f1.png)
 
+#### 详细版
 
+![image-20250928091555092](https://houlir2.dpdns.org/2025/09/85e1d5416f36fc8781ad7b78881c67c1.png)
 
+说明：
 
+![image-20250928092525994](https://houlir2.dpdns.org/2025/09/7e926be8190558fc4a8b684c175eb44a.png)
 
+### SEO 的时序
 
+**SEQ 的实现包括组合逻辑和两种存储器设备：时钟寄存器（程序计数器和条件码寄存器），随机访问存储器（寄存器文件、指令内存和数据内存）**。
 
+1. **组合逻辑不需要任何时序或控制**，只要输入变化了，值就通过逻辑门网络传播  
+2. ==程序计数器、条件码寄存器、数据内存和寄存器文件。这些单元通过一个时钟信号来控制，==它触发将新值装载到寄存器以及将值写到随机访间存储器。
+   1. **每个时钟周期，程序计数器都会装载新的指令地址。**
+   2. **只有在执行整数运算指令时，才会装载条件码寄存器。**  
+   3. **只有在执行 rmrnovq 、 pushq或 call 指令时，才会写数据内存**  
+   4. **寄存器文件的两个写端口允许每个时钟周期更新两个程序寄存器，不过我们可以用特殊的寄存器 ID OxF 作为端口地址，来表明在此端口不应该执行写操作。**  
 
+![image-20250928094528324](https://houlir2.dpdns.org/2025/09/00c6d11c5152d51d9a7307cd016b58f3.png)
 
+![image-20250928094555302](https://houlir2.dpdns.org/2025/09/7c78b2f85fbaac8eaa955b3e6c2d4d58.png)
 
+![image-20250928094623052](https://houlir2.dpdns.org/2025/09/1b83df13c4836af36229c5f0cff497c7.png)
 
+### SEQ 在HCL硬件控制语言的上的实现
 
+![image-20250928095145051](https://houlir2.dpdns.org/2025/09/f101fa030830c746eebffb0133b7c47f.png)
 
+注意：nop和halt的意义
 
+![image-20250928095217701](https://houlir2.dpdns.org/2025/09/31052588a920241c976323c53ab9c6b5.png)
 
+![image-20250928095229206](https://houlir2.dpdns.org/2025/09/0a394ad470ce081c5427ca2ed7414a1a.png)
 
+![image-20250928095240019](https://houlir2.dpdns.org/2025/09/2e2899b422bd8867bab767e94534288e.png)
 
+![image-20250928095248910](https://houlir2.dpdns.org/2025/09/26d2146599dee4c9ba0b376d958e6bce.png)
 
-
-
-
-
+![image-20250928095258230](https://houlir2.dpdns.org/2025/09/f14a35b7a6169179da5bccea44ee0d19.png)
 
 
 
