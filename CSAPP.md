@@ -2189,22 +2189,24 @@ AVX (Advanced Vector Extension , 高级向量扩展）  ，其中包括：
 
 ## Y86的顺序实现
 
-### 处理器顺序执行流程
+### 指令顺序执行流程
 
 1. 取址（fetch）
-2. 译码（decode）
+2. **译码（decode）**
 3. 执行（execute）
 4. 访存（memory）
-5. 写回（write back）
-6. 更新PC（PC update）
+5. **写回（write back）**
+6. **更新PC（PC update）**
 
-![image-20250928083835871](https://houlir2.dpdns.org/2025/09/e08cc6ffe286590b97fd5227974c2fd7.png)
+> **改进后的执行顺序只需五步，最后一步的更新PC会放到取址或译码之前（也叫SEQ+）**
+
+<img src="https://houlir2.dpdns.org/2025/09/e08cc6ffe286590b97fd5227974c2fd7.png" alt="image-20250928083835871" style="zoom:50%;" />
 
 示例：
 
-![image-20250928084926989](https://houlir2.dpdns.org/2025/09/57ffcf8ef3cfef177b2871d8d7e65150.png)
+<img src="https://houlir2.dpdns.org/2025/09/57ffcf8ef3cfef177b2871d8d7e65150.png" alt="image-20250928084926989" style="zoom:50%;" />
 
-![image-20250928085055772](https://houlir2.dpdns.org/2025/09/4e271ff157b4b384b0115ae58dec9843.png)
+<img src="https://houlir2.dpdns.org/2025/09/4e271ff157b4b384b0115ae58dec9843.png" alt="image-20250928085055772" style="zoom:50%;" />
 
 ### SEO 硬件结构
 
@@ -2212,50 +2214,197 @@ SEQ("sequential" 顺序的）的处理器
 
 #### 精简和解析
 
-![image-20250928091528068](https://houlir2.dpdns.org/2025/09/529d9d667b3eaf6e03d498c87304f4b0.png)
+<img src="https://houlir2.dpdns.org/2025/09/529d9d667b3eaf6e03d498c87304f4b0.png" alt="image-20250928091528068" style="zoom:50%;" />
 
-![image-20250928091541098](https://houlir2.dpdns.org/2025/09/59251f5bc5cea1b732abc4582249e0f1.png)
+<img src="https://houlir2.dpdns.org/2025/09/59251f5bc5cea1b732abc4582249e0f1.png" alt="image-20250928091541098" style="zoom:50%;" />
 
 #### 详细版
 
-![image-20250928091555092](https://houlir2.dpdns.org/2025/09/85e1d5416f36fc8781ad7b78881c67c1.png)
+<img src="https://houlir2.dpdns.org/2025/09/85e1d5416f36fc8781ad7b78881c67c1.png" alt="image-20250928091555092" style="zoom: 50%;" />
 
 说明：
 
-![image-20250928092525994](https://houlir2.dpdns.org/2025/09/7e926be8190558fc4a8b684c175eb44a.png)
+<img src="https://houlir2.dpdns.org/2025/09/7e926be8190558fc4a8b684c175eb44a.png" alt="image-20250928092525994" style="zoom:50%;" />
 
 ### SEO 的时序
 
 **SEQ 的实现包括组合逻辑和两种存储器设备：时钟寄存器（程序计数器和条件码寄存器），随机访问存储器（寄存器文件、指令内存和数据内存）**。
 
-1. **组合逻辑不需要任何时序或控制**，只要输入变化了，值就通过逻辑门网络传播  
+1. **组合逻辑不需要任何时序或控制**，只要输入变化了，值就通过逻辑门网络传播
 2. ==程序计数器、条件码寄存器、数据内存和寄存器文件。这些单元通过一个时钟信号来控制，==它触发将新值装载到寄存器以及将值写到随机访间存储器。
    1. **每个时钟周期，程序计数器都会装载新的指令地址。**
    2. **只有在执行整数运算指令时，才会装载条件码寄存器。**  
    3. **只有在执行 rmrnovq 、 pushq或 call 指令时，才会写数据内存**  
    4. **寄存器文件的两个写端口允许每个时钟周期更新两个程序寄存器，不过我们可以用特殊的寄存器 ID OxF 作为端口地址，来表明在此端口不应该执行写操作。**  
 
-![image-20250928094528324](https://houlir2.dpdns.org/2025/09/00c6d11c5152d51d9a7307cd016b58f3.png)
+<img src="https://houlir2.dpdns.org/2025/09/00c6d11c5152d51d9a7307cd016b58f3.png" alt="image-20250928094528324" style="zoom:50%;" />
 
-![image-20250928094555302](https://houlir2.dpdns.org/2025/09/7c78b2f85fbaac8eaa955b3e6c2d4d58.png)
+<img src="https://houlir2.dpdns.org/2025/09/7c78b2f85fbaac8eaa955b3e6c2d4d58.png" alt="image-20250928094555302" style="zoom:50%;" />
 
-![image-20250928094623052](https://houlir2.dpdns.org/2025/09/1b83df13c4836af36229c5f0cff497c7.png)
+<img src="https://houlir2.dpdns.org/2025/09/1b83df13c4836af36229c5f0cff497c7.png" alt="image-20250928094623052" style="zoom:50%;" />
 
 ### SEQ 在HCL硬件控制语言的上的实现
 
-![image-20250928095145051](https://houlir2.dpdns.org/2025/09/f101fa030830c746eebffb0133b7c47f.png)
+<img src="https://houlir2.dpdns.org/2025/09/f101fa030830c746eebffb0133b7c47f.png" alt="image-20250928095145051" style="zoom:50%;" />
 
 注意：nop和halt的意义
 
-![image-20250928095217701](https://houlir2.dpdns.org/2025/09/31052588a920241c976323c53ab9c6b5.png)
+<img src="https://houlir2.dpdns.org/2025/09/31052588a920241c976323c53ab9c6b5.png" alt="image-20250928095217701" style="zoom:50%;" />
 
-![image-20250928095229206](https://houlir2.dpdns.org/2025/09/0a394ad470ce081c5427ca2ed7414a1a.png)
+<img src="https://houlir2.dpdns.org/2025/09/0a394ad470ce081c5427ca2ed7414a1a.png" alt="image-20250928095229206" style="zoom:50%;" />
 
-![image-20250928095240019](https://houlir2.dpdns.org/2025/09/2e2899b422bd8867bab767e94534288e.png)
+<img src="https://houlir2.dpdns.org/2025/09/2e2899b422bd8867bab767e94534288e.png" alt="image-20250928095240019" style="zoom:50%;" />
 
-![image-20250928095248910](https://houlir2.dpdns.org/2025/09/26d2146599dee4c9ba0b376d958e6bce.png)
+<img src="https://houlir2.dpdns.org/2025/09/26d2146599dee4c9ba0b376d958e6bce.png" alt="image-20250928095248910" style="zoom:50%;" />
 
-![image-20250928095258230](https://houlir2.dpdns.org/2025/09/f14a35b7a6169179da5bccea44ee0d19.png)
+<img src="https://houlir2.dpdns.org/2025/09/f14a35b7a6169179da5bccea44ee0d19.png" alt="image-20250928095258230" style="zoom:50%;" />
+
+
+
+## 流水线技术
+
+<img src="https://houlir2.dpdns.org/2025/10/5dac4c6a7bde94850cab6e608a84d157.png" alt="image-20251002141742941" style="zoom:50%;" />
+
+**汇编代码的每一条指令可以理解为图中的一行，而每一行所经过的不同步骤，也就是“取址——译码——执行——访存——写回”五个步骤。每一个步骤需要消耗一个时钟周期。这里有 5 个步骤，就叫做 5 级流水线（也叫浅流水线），现代高效能处理器都基本采用 10 级以上（也叫深流水线）更细分的流水线来提高效率**
+
+如果是顺序执行这些指令的话，我们就需要每次执行完五个步骤才能去执行其他的指令；而会出现很多闲置时间未使用的（如指令1在执行阶段，但指令2可以执行取址或其他操作）
+
+**流水线技术就是将这些空闲的时间充分利用起来，达到一种“交错并行”的流程。**——**之所以要错开**，1 是因为 每个步骤只存在一个相应的硬件能够执行，2 **是因为很多指令的操作是需要等其他指令完成后才能执行（指令的输入是前面的指令的输出，且这种输出作为输入的载入数据通常是在时钟上升的时候）**的。
+
+<img src="https://houlir2.dpdns.org/2025/10/4ab190fa0ace7e5ba808c837f454a14c.png" alt="image-20251002152151490" style="zoom:50%;" />
+
+1 的问题现今已有**超流水线技术**，有多单元硬件，可以执行多个相同的指令，但是必须不存在问题 2 的情况。
+
+<img src="https://houlir2.dpdns.org/2025/10/3bfeeeee852cc72051b38e8bbb98c165.png" alt="image-20251002144708377" style="zoom:50%;" />
+
+### 计算流水线和CPU指标
+
+**流水线化的一个重要特性就是提高了系统的吞吐量 (throughput), 也就是单位时间内服务的顾客总数**，不过它也会轻微地增加延迟 (latency), 也就是服务一个用户所需要的时间  
+
+我们去执行指令，说白了就是从指令读取对应的很多的位表示，通过译码器去译码，产生出真正要执行的内容，执行后就会有对应的输出，这一整个过程可以算作一个**“组合逻辑”**
+
+<img src="https://houlir2.dpdns.org/2025/10/aadc43b6dd5d61c48ed4e68adbd35a40.png" alt="image-20251002151033600" style="zoom:50%;" />
+
+**$$吞吐量 = \frac{完成的任务总数}{总时间}$$**
+
+<img src="https://houlir2.dpdns.org/2025/10/978840e3787080e3c2156e28822051b9.png" alt="image-20251002151555087" style="zoom:50%;" />
+
+1. **时钟频率：xx Ghz**
+2. **时钟（振荡）周期：时钟频率（xx Ghz）的倒数，是计算机中最基本、最小的时间单位。如2.4Ghz的时钟周期为1/(2.4 * 10^9^)。表示的是执行一个指令阶段如译码所需的时间**
+3. **机器（cpu）周期：指完成一个基本操作（如取指或读存储器），以读取一个指令的最短时间来规定cpu周期。其包含多个时钟周期**
+4. **总线周期：cpu完成一次内存访问（读写）或IO接口操作所需要的时间**；一个总线周期通常由n个时钟周期组成
+5. **指令周期：包含   取值-》译码-》执行 -》访存 -》写回  的时间，其可能包含0-多条总线周期**
+6. **存储周期：主存储器两次启动操作之间需要的最小时间间隔，即存储器周期时间**
+
+其中：**时钟周期 < 机器（cpu）周期 ~= 总线周期 < 指令周期**
+
+### SEQ+
+
+使pc在时钟周期开始时执行，通过预测的方式来计算下一个pc
+
+<img src="https://houlir2.dpdns.org/2025/10/94d5619069961e58a053f5dabace4c62.png" alt="image-20251002155641312" style="zoom:50%;" />
+
+pc预测：
+
+<img src="https://houlir2.dpdns.org/2025/10/e2ed42a1fb0d71bd20381c2d3c812f0c.png" alt="image-20251002155839017" style="zoom:50%;" />
+
+### 流水线的冒险问题
+
+流水线可能出现的两种问题：
+
+1. **数据相关（数据冒险）：需要访问别人的输出值时，别的指令还没有写入（保存）。**
+
+   解决方法：
+
+   1. **增加暂停：可以通过一些nop（啥也不做）的了指令来拖延时间，直至写入**
+
+   2. **数据转发：如果未写入，则转发到目前需要用的地方，防止数据冒险**
+
+      <img src="https://houlir2.dpdns.org/2025/10/b22a8142c3eae2c10b427a1ced50ecb2.png" alt="image-20251002160523302" style="zoom:50%;" />
+
+      > 两个方法结合可以解决90%的问题
+
+2. 控制相关
+
+<img src="https://houlir2.dpdns.org/2025/10/c81336f70aa126e46e4a586da97541fc.png" alt="image-20251002160103063" style="zoom:50%;" />
+
+### 异常处理
+
+1. halt指令
+2. 非法指令和功能码组合的指令
+3. 试图访问一个非法地址
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
