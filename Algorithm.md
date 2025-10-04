@@ -250,6 +250,12 @@ std::unordered_map 底层实现为哈希表，std::map 和std::multimap 的底�
 
 当我们要使用集合来解决哈希问题的时候，优先使用unordered_set，因为它的查询和增删效率是最优的，**如果需要集合是有序的，那么就用set，如果要求不仅有序还要有重复数据的话，那么就用multiset。**
 
+
+
+**C++中map、set、multimap，multiset的底层实现都是平衡二叉搜索树**，所以map、set的增删操作时间时间复杂度是logn
+
+> 而unordered_map、unordered_set，unordered_map、unordered_set底层实现是**哈希表**。
+
 # 字符串
 
 [String](##String)
@@ -272,17 +278,17 @@ STL中栈和队列往往不被归类为容器，而被归类为**container adapt
 
 **栈和队列**内部存储数据的方式都**默认是deque的方式**，对外提供的借口才是栈和队列常规的操作
 
-> deque是一个双向队列，只要封住一端，只开通另一端就可以实现栈的逻辑了。
+> **deque是一个双向队列**，只要封住一端，只开通另一端就可以实现栈的逻辑了。
 
 ## 序列容器和容器适配器区别
 
-| 容器 / 适配器 | 类型       | 底层实现                            | 核心特性                                                     | 适用场景                                                     |
-| ------------- | ---------- | ----------------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
-| `vector`      | 序列容器   | 动态数组（连续内存空间）            | **随机访问快**（`O(1)`），**尾部插入 / 删除快**（`O(1)`），中间插入 / 删除慢（`O(n)`） | 需要频繁随机访问、尾部操作，且**插入删除集中在尾部**的场景（如存储列表、缓存） |
-| `list`        | 序列容器   | 双向链表（非连续内存，节点链接）    | 随机访问慢（`O(n)`），**任意位置插入 / 删除快**（`O(1)`，只需修改指针） | 需要频繁在中间插入 / 删除元素，且很少随机访问的场景（如链表、队列模拟） |
-| `deque`       | 序列容器   | 分段连续内存（中控器管理多段数组）  | **两端插入 / 删除快（`O(1)`），随机访问较快**（`O(1)`），中间插入 / 删除慢（`O(n)`） | 需要高效两端操作，且有一定随机访问需求的场景（如双端队列、滑动窗口） |
-| `stack`       | 容器适配器 | 默认基于 `deque` 实现（可指定其他） | 后进先出（LIFO），**仅允许访问栈顶元素**                     | 实现递归、表达式解析、撤销操作等需要 “后进先出” 的场景       |
-| `queue`       | 容器适配器 | 默认基于 `deque` 实现（可指定其他） | 先进先出（FIFO），**仅允许访问队首元素**                     | 实现任务调度、消息队列等需要 “先进先出” 的场景               |
+| 容器 / 适配器 | 类型       | 底层实现                                | 核心特性                                                     | 适用场景                                                     |
+| ------------- | ---------- | --------------------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| `vector`      | 序列容器   | 动态数组（连续内存空间）                | **随机访问快**（`O(1)`），**尾部插入 / 删除快**（`O(1)`），中间插入 / 删除慢（`O(n)`） | 需要频繁随机访问、尾部操作，且**插入删除集中在尾部**的场景（如存储列表、缓存） |
+| `list`        | 序列容器   | **双向链表**（非连续内存，节点链接）    | 随机访问慢（`O(n)`），**任意位置插入 / 删除快**（`O(1)`，只需修改指针） | 需要频繁在中间插入 / 删除元素，且很少随机访问的场景（如链表、队列模拟） |
+| `deque`       | 序列容器   | 分段连续内存（中控器管理多段数组）      | **两端插入 / 删除快（`O(1)`），随机访问较快**（`O(1)`），中间插入 / 删除慢（`O(n)`） | 需要高效两端操作，且有一定随机访问需求的场景（如双端队列、滑动窗口） |
+| `stack`       | 容器适配器 | 默认**基于 `deque` 实现**（可指定其他） | 后进先出（LIFO），**仅允许访问栈顶元素**                     | 实现递归、表达式解析、撤销操作等需要 “后进先出” 的场景       |
+| `queue`       | 容器适配器 | 默认**基于 `deque` 实现**（可指定其他） | 先进先出（FIFO），**仅允许访问队首元素**                     | 实现任务调度、消息队列等需要 “先进先出” 的场景               |
 
 以下是 `vector`、`list`、`deque`、`stack`、`queue` 的相同方法与不同方法对比（基于 C++ 标准库）：
 
@@ -306,12 +312,16 @@ STL中栈和队列往往不被归类为容器，而被归类为**container adapt
 std::stack<int, std::vector<int>> third;  // 使用vector为底层容器的栈
 std::queue<int, std::list<int>> third;  // 使用list为底层容器的队列
 
-// 默认的情况下
+// 默认的情况下使用deque作为底层
 stack<int> st;
 queue<int> de;
 ```
 
 ## 优先级队列
+
+**就是一个披着队列外衣的堆**
+
+**堆是一棵完全二叉树，树中每个结点的值都不小于（或不大于）其左右孩子的值。** 如果父亲结点是大于等于左右孩子就是大顶堆，小于等于左右孩子就是小顶堆。
 
 **`priority_queue<类型, 容器, 比较器> pque`**
 
@@ -326,9 +336,271 @@ priority_queue<int, vector<int>, greater<int>> pque2; // 储存int的小顶堆
 
 # 二叉树
 
-**C++中map、set、multimap，multiset的底层实现都是平衡二叉搜索树**，所以map、set的增删操作时间时间复杂度是logn
+## 定义
 
-> 而unordered_map、unordered_set，unordered_map、unordered_set底层实现是**哈希表**。
+```cpp
+struct TreeNode {
+    int val;
+    TreeNode *left;
+    TreeNode *right;
+    TreeNode(int x) : val(x), left(NULL), right(NULL) {}
+};
+```
+
+## 遍历
+
+### 深度优先遍历
+
+这是图里的叫法，分为前序中序后序
+
+1. 递归
+
+   ```cpp
+   class Solution {
+   public:
+       void traversal(TreeNode* cur, vector<int>& vec) {
+           if (cur == NULL) return;
+           vec.push_back(cur->val);    // 中
+           traversal(cur->left, vec);  // 左
+           traversal(cur->right, vec); // 右
+       }
+       vector<int> preorderTraversal(TreeNode* root) {
+           vector<int> result;
+           traversal(root, result);
+           return result;
+       }
+   };
+   ```
+
+2. 迭代（栈➕循环）
+
+   ```cpp
+   // 前序
+   class Solution {
+   public:
+       vector<int> preorderTraversal(TreeNode* root) {
+           stack<TreeNode*> st;
+           vector<int> result;
+           if (root == NULL) return result;
+           st.push(root);
+           while (!st.empty()) {
+               TreeNode* node = st.top();                       // 中
+               st.pop();
+               result.push_back(node->val);
+               if (node->right) st.push(node->right);           // 右（空节点不入栈）
+               if (node->left) st.push(node->left);             // 左（空节点不入栈）
+           }
+           return result;
+       }
+   };
+   
+   
+   
+   // 中序
+   class Solution {
+   public:
+       vector<int> inorderTraversal(TreeNode* root) {
+           vector<int> result;
+           stack<TreeNode*> st;
+           TreeNode* cur = root;
+           while (cur != NULL || !st.empty()) {
+               if (cur != NULL) { // 指针来访问节点，访问到最底层
+                   st.push(cur); // 将访问的节点放进栈
+                   cur = cur->left;                // 左
+               } else {
+                   cur = st.top(); // 从栈里弹出的数据，就是要处理的数据（放进result数组里的数据）
+                   st.pop();
+                   result.push_back(cur->val);     // 中
+                   cur = cur->right;               // 右
+               }
+           }
+           return result;
+       }
+   };
+   ```
+
+3. 统一的迭代法
+
+   1. 空指针标记法
+
+      ```cpp
+      class Solution {
+      public:
+          vector<int> inorderTraversal(TreeNode* root) {
+              // 统一迭代法实现中序遍历（通过boolean 标记法）
+              vector<int> res;
+              stack<TreeNode*> st;
+              if (root)
+                  st.push(root);
+              while (!st.empty()) {
+                  TreeNode* cur = st.top();
+                  // 如果当前不是空节点，则调整一下顺序（先取出中节点），顺序为：右中左（中序遍历）
+                  if (cur) {
+                      st.pop();
+                      if (cur->right) st.push(cur->right);
+                      st.push(cur);
+                      // 添加一个空节点，要求只有遇到空节点时，才输出到res中，否则是算作可能出现重复的情况
+                      st.push(nullptr);
+                      if (cur->left) st.push(cur->left);
+                  }
+                  else {
+                      st.pop();
+                      cur = st.top();
+                      st.pop();
+                      res.push_back(cur->val);
+                  }
+              }
+              return res;
+          }
+      };
+      ```
+
+      
+
+   2. boolean 标记法
+
+      ```cpp
+      class Solution {
+      public:
+          vector<int> inorderTraversal(TreeNode* root) {
+              // 统一迭代法实现中序遍历（通过boolean 标记法）
+              vector<int> res;
+              stack<pair<TreeNode*, bool>> st;
+              if (root)
+                  st.push(make_pair(root, false));
+              while (!st.empty()) {
+                  TreeNode* cur = st.top().first;
+                  // 用来表示当前节点是否已经访问过（处理好顺序了），如果访问过就直接输出该节点了，否则调整顺序
+                  bool visited = st.top().second;
+                  st.pop();
+                  if (visited) {
+                      res.push_back(cur->val);
+                      continue;
+                  }
+      
+                  if (cur->right) st.push(make_pair(cur->right, false));
+                  // 只有中节点是调整好的，此时将访问设置为true
+                  st.push(make_pair(cur, true));
+                  if (cur->left) st.push(make_pair(cur->left, false));
+              }
+              return res;
+          }
+      };
+      ```
+
+      
+
+      
+
+   
+
+### 广度优先遍历
+
+也就是层序遍历
+
+1. 递归
+
+   ```cpp
+   class Solution {
+   public:
+       void levelTraversal(TreeNode* cur, vector<vector<int>>& res, int depth) {
+           // 先设置好递归结束的条件
+           if (!cur) return;
+           // 如果是新的一层，则加入空的一维数组
+           if (res.size() == depth)
+               res.push_back(vector<int> ());
+           
+           // 接下来就是递归的操作，先插入当前节点
+           res[depth].push_back(cur->val);
+           // 开始左子树右子树递归了
+           levelTraversal(cur->left, res, depth + 1);
+           levelTraversal(cur->right, res, depth + 1);
+       }
+       vector<vector<int>> levelOrder(TreeNode* root) {
+           // 递归方式实现层序遍历
+           // 树的递归方式的使用方式一般是：主函数中直接调用一个递归函数（和主函数不同），传入的数组要求是能够修改的
+           vector<vector<int>> res;
+           levelTraversal(root, res, 0);
+           return res;
+       }
+   };
+   ```
+
+   
+
+2. 利用队列
+
+   ```cpp
+   class Solution {
+   public:
+       vector<vector<int>> levelOrder(TreeNode* root) {
+           // 迭代实现层序遍历：利用了队列
+           vector<vector<int>> res;
+           queue<TreeNode*> que;
+           if (root)
+               que.push(root);
+           // 用一个size来确定某节点是属于哪一层（哪一个vector里的）
+           while (!que.empty()) {
+               // 用来总结每一层的节点
+               vector<int> t;
+               // 每一轮大循环的que里的元素，都表示的是本层中有的节点数量
+               int s = que.size();
+               for (int i = 0; i < s; i++) {
+                   TreeNode* cur = que.front();
+                   que.pop();
+                   t.push_back(cur->val);
+   
+                   if (cur->left) {
+                       que.push(cur->left);
+                   }
+                   if (cur->right) {
+                       que.push(cur->right);
+                   }
+               }
+               res.push_back(t);
+           }
+           return res;
+       }
+   };
+   ```
+
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# 回溯算法
 
 回溯算法的框架：
 
@@ -386,7 +658,7 @@ C++ 标准库容器可分为 **序列容器**、**关联容器**、**无序关�
 | ---------------- | ------------------------------------------------------------ | -------------------------------------------------------- |
 | `vector`         | `operator[]`、`at(i)`（随机访问）、`push_back(x)`、`pop_back(x)`、`reserve(n)`（预留空间）、`capacity()`（当前容量） | 频繁随机访问、尾部插入 / 删除（如存储列表、动态数组）    |
 | `list（双链表）` | `push_front(x)`、`pop_front(x)`、`splice(pos, other)`（合并链表）、`unique()`（去重）、`reverse()`（反转） | 频繁在任意位置插入 / 删除（如链表、双向队列）            |
-| `deque`          | `operator[]`、`at(i)`（随机访问）、`push_front(x)`、`pop_front(x)`、`push_back(x)`、`pop_back(x)` | 高效两端操作 + 随机访问（如**双端队列**、滑动窗口）      |
+| `deque`          | `operator[]`、`at(i)`（随机访问）、**`push_front(x)`、`pop_front(x)`、**`push_back(x)`、`pop_back(x)` | 高效两端操作 + 随机访问（如**双端队列**、滑动窗口）      |
 | `array`          | `operator[]`、`at(i)`（随机访问）、`data()`（返回底层数组指针） | 固定大小数组（编译期确定大小，如存储坐标、固定长度数据） |
 | `forward_list`   | `push_front(x)`、`pop_front(x)`、`insert_after(pos, x)`（在指定位置后插入） | **单向链表**，内存占用小，仅需前向遍历（如实现单向队列） |
 
@@ -410,11 +682,15 @@ C++ 标准库容器可分为 **序列容器**、**关联容器**、**无序关�
 
 #### 容器适配器（封装底层容器，接口受限）
 
-| 容器             | 核心方法（独有或特色）                                       | 底层默认容器 | 适用场景                                       |
-| ---------------- | ------------------------------------------------------------ | ------------ | ---------------------------------------------- |
-| `stack`          | `push(x)`（栈顶插入）、`pop()`（栈顶删除，无返回）、`top()`（访问栈顶） | `deque`      | 后进先出（LIFO）场景（如递归模拟、表达式解析） |
-| `queue`          | `push(x)`（队尾插入）、`pop()`（队首删除，无返回）、`front()`（访问队首）、`back()`（访问队尾） | `deque`      | 先进先出（FIFO）场景（如任务调度、消息队列）   |
-| `priority_queue` | `push(x)`（插入并维持优先级）、`pop()`（删除最高优先级元素）、`top()`（访问最高优先级元素） | `vector`     | 需按优先级处理元素（如最大堆、任务优先级调度） |
+`容器适配器<类型，容器，构造器>`
+
+构造器仅针对priority_queue有，如果指定了构造器，则必须指定容器，否则容器可以不写
+
+| 容器             | 核心方法（独有或特色）                                       | 底层默认容器 | 适用场景                                       | 特殊说明                               |
+| ---------------- | ------------------------------------------------------------ | ------------ | ---------------------------------------------- | -------------------------------------- |
+| `stack`          | **`push(x)`（栈顶插入）、`pop()`（栈顶删除，无返回）、`top()`（访问栈顶）** | `deque`      | 后进先出（LIFO）场景（如递归模拟、表达式解析） | top()                                  |
+| `queue`          | `push(x)`（队尾插入）、`pop()`（队首删除，无返回）、**`front()`（访问队首）、`back()`（访问队尾）** | `deque`      | 先进先出（FIFO）场景（如任务调度、消息队列）   | front()                                |
+| `priority_queue` | `push(x)`（插入并维持优先级）、`pop()`（删除最高优先级元素）、**`top()`（访问最高优先级元素）** | `vector`     | 需按优先级处理元素（如最大堆、任务优先级调度） | top()，less表示大顶堆，greater是小顶堆 |
 
 ### 核心差异总结
 
@@ -490,15 +766,15 @@ C++STL中的内置算法主要在[头文件](https://so.csdn.net/so/search?q=头
 
    在**已升序排序**的元素中，应用二分查找检索指定元素，返回对应元素迭代器位置。**找不到则返回尾迭代器。**
 
-   - `lower_bound()`: 寻找 ≥x 的第一个元素的位置
-   - `upper_bound()`: 寻找 >x 的第一个元素的位置
+   - **`lower_bound()`: 寻找 ≥x 的第一个元素的位置**
+   - **`upper_bound()`: 寻找 >x 的第一个元素的位置**
 
    怎么找 / 的第一个元素呢？
 
    -  \>x 的第一个元素的前一个元素（如果有）便是 ≤x 的第一个元素
    -  ≥x  的第一个元素的前一个元素（如果有）便是 <x 的第一个元素
 
-   返回的是迭代器，如何转成下标索引呢？减去头迭代器即可。
+   **返回的是迭代器，如何转成下标索引呢？减去头迭代器即可。**
 
    ```cpp
    //原型一
@@ -966,9 +1242,19 @@ for (vector<int>::iterator it = a.begin(); it != a.end(); ++it)
 >
 > 注意插入和删除的情况元素变动会对迭代效果产生影响
 
+## lambda
 
+lambda 的一种语法：
 
+```
+[capture] (parameters) mutable -> return-type {statement}
+```
 
+> 1. lambda 以 capture 子句开头，它指定哪些变量被捕获（有点类似于参数，但**这里如果指定了mutable的话，这些捕获的内容就能够修改影响到外面**），捕获列表可为空，或指定捕获方式：有 `&` 符号前缀的变量通过 [引用](https://oi-wiki.org/lang/reference/) 访问，没有该前缀的变量通过值访问
+> 2. 传参
+> 3. 可加可不加，用于说明要不要修改capture的内容
+> 4. 返回类型，可以不加
+> 5. 函数体
 
 
 

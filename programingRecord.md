@@ -941,9 +941,78 @@ def backtrack(路径, 选择列表):
 
 20. 
 
+## 10月
 
+1. 无
 
+2. 无
 
+3. [144. Binary Tree Preorder Traversal](https://leetcode.cn/problems/binary-tree-preorder-traversal/)
+
+   [94. Binary Tree Inorder Traversal](https://leetcode.cn/problems/binary-tree-inorder-traversal/)
+
+   [145. Binary Tree Postorder Traversal](https://leetcode.cn/problems/binary-tree-postorder-traversal/)
+
+   都分别有递归和迭代（栈）两种方法
+
+4. [102. Binary Tree Level Order Traversal](https://leetcode.cn/problems/binary-tree-level-order-traversal/)
+
+   也是有递归和迭代（队列）两种方法
+
+   ```cpp
+           vector<vector<int>> res;
+           queue<TreeNode*> que;
+           if (root)
+               que.push(root);
+           while (!que.empty()) {
+               vector<int> t;
+               int s = que.size();
+               for (int i = 0; i < s; i++) {
+                   TreeNode* cur = que.front();
+                   que.pop();
+                   t.push_back(cur->val);
+   
+                   if (cur->left) {
+                       que.push(cur->left);
+                   }
+                   if (cur->right) {
+                       que.push(cur->right);
+                   }
+               }
+               res.push_back(t);
+           }
+           return res;
+   ```
+
+   
+
+   [199. Binary Tree Right Side View](https://leetcode.cn/problems/binary-tree-right-side-view/)
+
+   这题是只需要取层序遍历的最右边的节点，n 层就有 n 个节点
+
+   [637. Average of Levels in Binary Tree](https://leetcode.cn/problems/average-of-levels-in-binary-tree/)
+
+   简单题
+
+   [429. N-ary Tree Level Order Traversal](https://leetcode.cn/problems/n-ary-tree-level-order-traversal/)
+
+   多一层循环
+
+   [515. Find Largest Value in Each Tree Row](https://leetcode.cn/problems/find-largest-value-in-each-tree-row/)
+
+   只需筛选一下即可
+
+   [104. Maximum Depth of Binary Tree](https://leetcode.cn/problems/maximum-depth-of-binary-tree/)
+
+   套模板即可
+
+   [111. Minimum Depth of Binary Tree](https://leetcode.cn/problems/minimum-depth-of-binary-tree/)
+
+   只需找到左右子树都不存在的那一层即可
+
+   [226. Invert Binary Tree](https://leetcode.cn/problems/invert-binary-tree/)
+
+   只需swap交换左右子树即可
 
 
 
