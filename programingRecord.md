@@ -1014,6 +1014,84 @@ def backtrack(路径, 选择列表):
 
    只需swap交换左右子树即可
 
+5. [101. Symmetric Tree](https://leetcode.cn/problems/symmetric-tree/)
+
+6. [101. Symmetric Tree](https://leetcode.cn/problems/symmetric-tree/)
+
+   1. 方法一（自己写的优化版）：用到**广度遍历，针对每一层，要求最左边和最右边往中间走，值要相同**
+   2. 方法二：使用递归的后序遍历的方式来判断，**左边实行左右中的顺序，右边实现右左中的顺序，需要注意当节点为空时需要插入一个作为标记，防止什么也不插入，会出现问题**
+   3. 方法三：判断二叉树是否对称，只需**递归判断内层（左子树的右儿子和右子树的左儿子）与外层是否相等**即可
+
+   [222. Count Complete Tree Nodes](https://leetcode.cn/problems/count-complete-tree-nodes/)
+
+   迭代法层序遍历搞定
+
+   [110. Balanced Binary Tree](https://leetcode.cn/problems/balanced-binary-tree/)
+
+   递归解
+
+7. [257. Binary Tree Paths](https://leetcode.cn/problems/binary-tree-paths/)
+
+   用到了递归和回溯，参考了，自己有一点思路但想不出完整的
+
+   [100. Same Tree](https://leetcode.cn/problems/same-tree/)
+
+   只需将对称的树算法的内层比较和外层比较设置为相同的左子树和右子树即可
+
+   [572. Subtree of Another Tree](https://leetcode.cn/problems/subtree-of-another-tree/)
+
+   利用到了第100做递归，参考了别的人
+
+   思路就是先找到节点值相同的节点，之后利用100做判断，如果没找到就继续dfs找
+
+8.  
+
+9.  
+
+10.  
+
+11.  
+
+12.  
+
+13.  
+
+14.  
+
+15.  
+
+16.  
+
+17.  
+
+18.  
+
+19.  
+
+20.  
+
+21.  
+
+22.  
+
+23.  
+
+24.  
+
+25.  
+
+26.  
+
+27.  
+
+28.  
+
+29.  
+
+30.  
+
+31. 
+
 
 
 
