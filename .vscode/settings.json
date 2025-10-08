@@ -74,7 +74,8 @@
         "ratio": "cpp",
         "stop_token": "cpp",
         "xlocbuf": "cpp",
-        "xlocmes": "cpp"
+        "xlocmes": "cpp",
+        "unordered_set": "cpp"
     },
     "C_Cpp.errorSquiggles": "enabled"
 }
