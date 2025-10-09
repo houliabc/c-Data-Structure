@@ -1061,9 +1061,26 @@ def backtrack(路径, 选择列表):
 
    [106. Construct Binary Tree from Inorder and Postorder Traversal](https://leetcode.cn/problems/construct-binary-tree-from-inorder-and-postorder-traversal/)
 
-   先构造根节点（指向后序序列的最后一个），在递归的调用左指针和右指针指向递归出来的新树
+   1. 先构造根节点（指向后序序列的最后一个），在递归的调用左指针和右指针指向递归出来的新树（将左右序列作为vector——耗时耗空间）
+   2. 去掉vector，采用指针的方式来实现
 
-9. 
+9. [105. Construct Binary Tree from Preorder and Inorder Traversal](https://leetcode.cn/problems/construct-binary-tree-from-preorder-and-inorder-traversal/)
+
+   用java写的根据下标来实现
+
+   [617. Merge Two Binary Trees](https://leetcode.cn/problems/merge-two-binary-trees/)
+
+   java版：思路是递归遍历两个树，当相同就和加起来构建一个新节点，否则用非空的那一个节点作为新树对应位置上的节点
+
+   [700. Search in a Binary Search Tree](https://leetcode.cn/problems/search-in-a-binary-search-tree/)
+
+   秒了：根据二叉搜索树先找到那一个节点
+
+   [98. Validate Binary Search Tree](https://leetcode.cn/problems/validate-binary-search-tree/)
+
+   递归实现，通过标记左子树和右子树的最小和最大范围来确定是否符合二叉搜索树
+
+   中序遍历递归法解决
 
 10. 
 
