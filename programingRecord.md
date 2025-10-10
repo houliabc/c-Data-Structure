@@ -1082,7 +1082,25 @@ def backtrack(路径, 选择列表):
 
    中序遍历递归法解决
 
-10. 
+10. [530. Minimum Absolute Difference in BST](https://leetcode.cn/problems/minimum-absolute-difference-in-bst/)
+
+    方法一：中序遍历BST（得到递增有序序列）构建对应的vector，后选出最小的两个即可
+
+    方法二：直接递归保存前节点的方式（无需构造vector）
+
+    [236. Lowest Common Ancestor of a Binary Tree](https://leetcode.cn/problems/lowest-common-ancestor-of-a-binary-tree/)
+
+    本题应该使用深度遍历，对于需要回溯的问题，后序遍历是最合适的，因为是先访问完两个子树才访问根节点的，正好符合本题回溯需求
+
+    [235. Lowest Common Ancestor of a Binary Search Tree](https://leetcode.cn/problems/lowest-common-ancestor-of-a-binary-search-tree/)
+
+    二叉搜索树是排序的，可以利用这一点，实现普通树的公共祖先
+
+    [701. Insert into a Binary Search Tree](https://leetcode.cn/problems/insert-into-a-binary-search-tree/)
+
+    先实现最简单的在叶子节点的左右子树中插入，就这一种情况
+
+    [450. Delete Node in a BST](https://leetcode.cn/problems/delete-node-in-a-bst/)
 
 11. 
 
