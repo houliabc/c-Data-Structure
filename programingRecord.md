@@ -933,7 +933,9 @@ def backtrack(路径, 选择列表):
 
 18. 无
 
-19. [102. Binary Tree Level Order Traversal](https://leetcode.cn/problems/binary-tree-level-order-traversal/)
+19. ### 二叉树
+
+    [102. Binary Tree Level Order Traversal](https://leetcode.cn/problems/binary-tree-level-order-traversal/)
 
     方法一：用队列来实现层序遍历
 
@@ -1100,11 +1102,25 @@ def backtrack(路径, 选择列表):
 
     先实现最简单的在叶子节点的左右子树中插入，就这一种情况
 
-    [450. Delete Node in a BST](https://leetcode.cn/problems/delete-node-in-a-bst/)
+11. [450. Delete Node in a BST](https://leetcode.cn/problems/delete-node-in-a-bst/)
 
-11. 
+    1. 方法一：当左右子树都有时，将左子树上位，且此左子树右指针应指向原右子树，且若左子树有右节点时，应该BST插入到原右子树的左子树里。使用了递归，并且还运用到了昨天写的BST中插入节点的方式，我的大题思路是正确的，但是一些细节问题没有写对，在gpt的帮助下，成功实现了
+    2. 方法二，更高效的方法：当删除节点左右子树都有时，将左子树插入到右子树的最左下角（根据BST性质，一定能插入且是符合要求的），而右子树作为新的子树节点上位替换那个被删除的节点，同时要递归的将从根开始的左右指针指向这个被删除节点后调整好的节点
+    3. 方法三：假设不是BST，不运用它的特性来实现删除操作（遍历所有节点）
 
-12. 
+    [669. Trim a Binary Search Tree](https://leetcode.cn/problems/trim-a-binary-search-tree/)
+
+    还以为是运用到上一题的知识，不断的删除，但其实不用那么复杂，直接重新规划指针即可
+
+    [108. Convert Sorted Array to Binary Search Tree](https://leetcode.cn/problems/convert-sorted-array-to-binary-search-tree/)
+
+    递归的去取数组中的中间左边元素来插入进二叉树中
+
+    致辞二叉树完结
+
+12. ### 回溯
+
+    
 
 13. 
 
@@ -1143,6 +1159,8 @@ def backtrack(路径, 选择列表):
 30. 
 
 31. 
+
+32. 
 
 
 
