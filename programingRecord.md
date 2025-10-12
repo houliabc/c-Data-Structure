@@ -1120,7 +1120,15 @@ def backtrack(路径, 选择列表):
 
 12. ### 回溯
 
-    
+    [77. Combinations](https://leetcode.cn/problems/combinations/)
+
+    实现想不出，因为明明是叫回溯算法，但我却忘记了pop_back的回溯方式，参考了就明白了
+
+    剪枝优化了循环次数
+
+    [40. Combination Sum II](https://leetcode.cn/problems/combination-sum-ii/)
+
+    这一题不需要考虑元素个数问题，而是考虑求的和要符合条件，但是因为存在重复值的问题，故一定会出现重复的结果，这就需要在插入前进行适当的筛选。我的实现参考了gpt的，对于重复元素进行了剪枝
 
 13. 
 
