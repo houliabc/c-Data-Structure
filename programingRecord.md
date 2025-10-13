@@ -1130,7 +1130,13 @@ def backtrack(路径, 选择列表):
 
     这一题不需要考虑元素个数问题，而是考虑求的和要符合条件，但是因为存在重复值的问题，故一定会出现重复的结果，这就需要在插入前进行适当的筛选。我的实现参考了gpt的，对于重复元素进行了剪枝
 
-13. 
+13. [216. Combination Sum III](https://leetcode.cn/problems/combination-sum-iii/)
+
+    和前面解法类似
+
+    [17. Letter Combinations of a Phone Number](https://leetcode.cn/problems/letter-combinations-of-a-phone-number/)
+
+    自己写的，会稍有点区别，大题框架还是一致的
 
 14. 
 
