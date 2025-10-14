@@ -1138,7 +1138,9 @@ def backtrack(路径, 选择列表):
 
     自己写的，会稍有点区别，大题框架还是一致的
 
-14. 
+14. [39. Combination Sum](https://leetcode.cn/problems/combination-sum/)
+
+    类似于 combination II，又是一个依靠和的结果，而不需要要求元素个数的，但唯一不同的点在于元素可以重复的选取，所以本题的关键在于如何破除重复值的问题
 
 15. 
 
