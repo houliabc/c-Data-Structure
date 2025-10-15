@@ -1142,7 +1142,13 @@ def backtrack(路径, 选择列表):
 
     类似于 combination II，又是一个依靠和的结果，而不需要要求元素个数的，但唯一不同的点在于元素可以重复的选取，所以本题的关键在于如何破除重复值的问题
 
-15. 
+15. [131. Palindrome Partitioning](https://leetcode.cn/problems/palindrome-partitioning/)
+
+    在参考的情况下完成了，难点就在于能够自己用子串提取出来（然后一次性插入进去substr），而不是像之前的题目一样，每次对子串sub进行+操作
+
+    [93. Restore IP Addresses](https://leetcode.cn/problems/restore-ip-addresses/)
+
+    确实很难想到，我甚至一开始的思路都是比较复杂、难以实现的，但思路本身并不能，通过参考，才能写出这道题
 
 16. 
 
