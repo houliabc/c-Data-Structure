@@ -19,7 +19,7 @@
 
 ### 代码留白
 
-![image-20250430095018624](https://houlir2.dpdns.org/2025/10/04f1efc180db055642d18e09d7b185cf.png)
+![image-20250430095018624](C:/Users/aaaa/AppData/Roaming/Typora/draftsRecover/assets/image-20250430095018624.png)
 
 # 程序性能
 
@@ -49,13 +49,13 @@
 
 **C／C＋＋的内存堆空间**的申请和释放完全靠**自己管理**
 
-![image-20250430095856923](https://houlir2.dpdns.org/2025/10/1edab95aa08736d4b6797243dc48c3c0.png)
+![image-20250430095856923](C:/Users/aaaa/AppData/Roaming/Typora/draftsRecover/assets/image-20250430095856923.png)
 
-![image-20250430095913315](https://houlir2.dpdns.org/2025/10/3894c79a62b0a3f86c094e5d78eccb9c.png)
+![image-20250430095913315](C:/Users/aaaa/AppData/Roaming/Typora/draftsRecover/assets/image-20250430095913315.png)
 
 ## 64位的编译器指针占8个字节
 
-![image-20250430100424783](https://houlir2.dpdns.org/2025/10/c452dc9e160c309c600b3ade4abb0b5f.png)
+![image-20250430100424783](C:/Users/aaaa/AppData/Roaming/Typora/draftsRecover/assets/image-20250430100424783.png)
 
 也就是说 CPU 可以访问 2^64^ 个内存地址
 
@@ -63,11 +63,11 @@
 
 CPU 读取内存是按照块来读取的，而一个块可以包含2、4、8、16字节。现在64位的操作系统对应的一块也就是8个字节，也就是cpu一次性能处理64位的数据
 
-![image-20250430115917711](https://houlir2.dpdns.org/2025/10/411b5d93275923f9d5e7e0bacb6549ca.png)
+![image-20250430115917711](C:/Users/aaaa/AppData/Roaming/Typora/draftsRecover/assets/image-20250430115917711.png)
 
 就浪费了资源，所以一定需要内存对齐，好处是：
 
-![image-20250430115955699](https://houlir2.dpdns.org/2025/10/4dc167e31036997be41b043cd1c7d122.png)
+![image-20250430115955699](C:/Users/aaaa/AppData/Roaming/Typora/draftsRecover/assets/image-20250430115955699.png)
 
 
 
@@ -274,7 +274,7 @@ std::unordered_map 底层实现为哈希表，std::map 和std::multimap 的底�
 
 STL中栈和队列往往不被归类为容器，而被归类为**container adapter（容器适配器）**。
 
-![栈与队列理论3](https://houlir2.dpdns.org/2025/07/679492fcf69aae0ac8c937adf8fcaf31.png)
+![栈与队列理论3](https://houlir2.dpdns.org/2025/10/679492fcf69aae0ac8c937adf8fcaf31.png)
 
 **栈和队列**内部存储数据的方式都**默认是deque的方式**，对外提供的借口才是栈和队列常规的操作
 
@@ -753,6 +753,7 @@ C++STL中的内置算法主要在[头文件](https://so.csdn.net/so/search?q=头
 
    ```cpp 
    swap(a, b);
+   ```
 
 5. **[x] [`reverse()`](https://zh.cppreference.com/w/cpp/algorithm/reverse)**
 
@@ -760,6 +761,7 @@ C++STL中的内置算法主要在[头文件](https://so.csdn.net/so/search?q=头
 
    ```cpp
    reverse(s.begin(), s.end());
+   ```
 
 6. [ ] `shuffle()` C++11
 
@@ -773,6 +775,7 @@ C++STL中的内置算法主要在[头文件](https://so.csdn.net/so/search?q=头
    vector<int> arr{1, 2, 1, 4, 5, 4, 4};
    sort(arr.begin(), arr.end());
    arr.erase(unique(arr.begin(), arr.end()), arr.end());
+   ```
 
 8. **[x] [`sort()`](https://zh.cppreference.com/w/cpp/algorithm/sort)**
 
@@ -780,6 +783,7 @@ C++STL中的内置算法主要在[头文件](https://so.csdn.net/so/search?q=头
 
    ```cpp
    void sort( RandomIt first, RandomIt last, Compare comp );  // 可以选用比较器
+   ```
 
 9. **[x] [`lower_bound()`](https://zh.cppreference.com/w/cpp/algorithm/lower_bound) / [`upper_bound()`](https://zh.cppreference.com/w/cpp/algorithm/upper_bound)**
 
@@ -807,6 +811,7 @@ C++STL中的内置算法主要在[头文件](https://so.csdn.net/so/search?q=头
    idx = lower_bound(arr.begin(), arr.end(), 8) - arr.begin(); // 4
    idx = upper_bound(arr.begin(), arr.end(), 7) - arr.begin(); // 4
    idx = upper_bound(arr.begin(), arr.end(), 8) - arr.begin(); // 5
+   ```
 
 10. **[x] [`max()`](https://zh.cppreference.com/w/cpp/algorithm/max) / [`min()`](https://zh.cppreference.com/w/cpp/algorithm/min)**
 
@@ -814,26 +819,31 @@ C++STL中的内置算法主要在[头文件](https://so.csdn.net/so/search?q=头
 
 12. [ ] `prev_permutation()` / `next_permutation()`
 
-1. 数学函数 cmath
-   1. **[x] [`abs()`](https://zh.cppreference.com/w/cpp/numeric/math/fabs)**
-   2. **[x] [`exp()`](https://zh.cppreference.com/w/cpp/numeric/math/exp)**
-   3. **[x] [`log()`](https://zh.cppreference.com/w/cpp/numeric/math/log) / `log10()` / `log2()`**
-   4. **[x] [`pow()`](https://zh.cppreference.com/w/cpp/numeric/math/pow)**
-   5. **[x] [`sqrt()`](https://zh.cppreference.com/w/cpp/numeric/math/sqrt)**
-   6. [ ] `sin()` / `cos()` / `tan()`
-   7. [ ] `asin()` / `acos()` / `atan()`
-   8. [ ] `sinh()` / `cosh()` / `tanh()`
-   9. [ ] `asinh()` / `acosh()` / `atanh()` C++11
-   10. **[x] [`ceil()`](https://zh.cppreference.com/w/cpp/numeric/math/ceil) / [`floor()`](https://zh.cppreference.com/w/cpp/numeric/math/floor)**
-   11. **[x] [`round()`](https://zh.cppreference.com/w/cpp/numeric/math/round) C++11**
-2. 数值算法 numeric
-   1. [ ] `iota()` C++11
-   2. [ ] `accumulate()`
-   3. **[x] [`gcd()`](https://zh.cppreference.com/w/cpp/numeric/gcd) C++17**
-   4. **[x] [`lcm()`](https://zh.cppreference.com/w/cpp/numeric/lcm) C++17**
-3. 伪随机数生成 random
-   1. [ ] `mt19937`
-   2. [ ] `random_device()`
+13. 数学函数 cmath
+
+    1. **[x] [`abs()`](https://zh.cppreference.com/w/cpp/numeric/math/fabs)**
+    2. **[x] [`exp()`](https://zh.cppreference.com/w/cpp/numeric/math/exp)**
+    3. **[x] [`log()`](https://zh.cppreference.com/w/cpp/numeric/math/log) / `log10()` / `log2()`**
+    4. **[x] [`pow()`](https://zh.cppreference.com/w/cpp/numeric/math/pow)**
+    5. **[x] [`sqrt()`](https://zh.cppreference.com/w/cpp/numeric/math/sqrt)**
+    6. [ ] `sin()` / `cos()` / `tan()`
+    7. [ ] `asin()` / `acos()` / `atan()`
+    8. [ ] `sinh()` / `cosh()` / `tanh()`
+    9. [ ] `asinh()` / `acosh()` / `atanh()` C++11
+    10. **[x] [`ceil()`](https://zh.cppreference.com/w/cpp/numeric/math/ceil) / [`floor()`](https://zh.cppreference.com/w/cpp/numeric/math/floor)**
+    11. **[x] [`round()`](https://zh.cppreference.com/w/cpp/numeric/math/round) C++11**
+
+14. 数值算法 numeric
+
+    1. [ ] `iota()` C++11
+    2. [ ] `accumulate()`
+    3. **[x] [`gcd()`](https://zh.cppreference.com/w/cpp/numeric/gcd) C++17**
+    4. **[x] [`lcm()`](https://zh.cppreference.com/w/cpp/numeric/lcm) C++17**
+
+15. 伪随机数生成 random
+
+    1. [ ] `mt19937`
+    2. [ ] `random_device()`
 
 ## String
 
@@ -1333,9 +1343,9 @@ int& r = *p;
 const int& rb = b;
 ```
 
-> 通常函数调用时采用**值传递**的方式，系统会在内存中开辟空间用来存储形参变量，并将实参变量的值拷贝给形参变量，所以**形参变量只是实参变量的副本而已**，并且如果函数传递的是类的对象，系统还会调用类中的拷贝构造函数来构造形参对象
-> 
-> **指针作为函数的形参**，虽然达到的效果跟使用引用一样，但**当调用函数时仍然需要为形参指针分配空间，引用则不需要**【引用在底层也会分配指针大小的空间，在汇编底层角度，引用和指针是一样的，不过引用类似于常量指针】。推荐使用引用而非指针作为函数的传递函数
+> //通常函数调用时采用值传递的方式，系统会在内存中开辟空间用来存储形参变量，并将实参变量的值拷贝给形参变量，所以形参变量只是实参变量的副本而已，并且如果函数传递的是类的对象，系统还会调用类中的拷贝构造函数来构造形参对象
+> //使用引用作为参数传递时，由于此时形参只是传递函数的实参变量或者对象的别名而非副本，故系统不会耗费时间在内存中开辟空间来存储形参，因此如果参数传递的数据较大，建议使用引用作为函数的形参，提高函数的时间效率，节省内存空间
+> //指针作为函数的形参，虽然达到的效果跟使用引用一样，但当调用函数时仍然需要为形参指针分配空间，引用则不需要【引用在底层也会分配指针大小的空间，在汇编底层角度，引用和指针是一样的，不过引用类似于常量指针】。推荐使用引用而非指针作为函数的传递函数
 
 ###  右值引用【*延长对象生命周期*】
 
@@ -1366,7 +1376,7 @@ double&& rr3 = fmin(x, y);
 >
 > 右值引用 rr2 引用右值 x + y 后，该表达式的返回值被存储到特定的位置，不能取表达式返回值 x + y 的地址，但是可以取 rr2 的地址，也可以修改 rr2 。 const double&& rr4 = x + y; &rr4; 可以对 rr4 取地址，但不能修改 rr4，即写成rr4 = 5.3;会编译报错。
 >
-> 2.  
+> 2. 
 >
 >    `const double&& rr4 = x + y;　　`
 >

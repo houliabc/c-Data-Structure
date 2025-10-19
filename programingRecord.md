@@ -1120,6 +1120,25 @@ def backtrack(路径, 选择列表):
 
 12. ### 回溯
 
+    ```cpp
+    private:
+    	vector<vector<int>> res;
+    	vector<int> t;
+    	
+    	void backTracking(vector<int> nums, int start) {
+            if () {
+                res.push_back(t);
+                return;
+            }
+            
+            for (int i = start; i < nums.size(); i++) {
+                t.push_back(nums[i]);
+                backTracking(nums, i + 1);
+                t.pop_back();
+            }
+        }
+    ```
+
     [77. Combinations](https://leetcode.cn/problems/combinations/)
 
     实现想不出，因为明明是叫回溯算法，但我却忘记了pop_back的回溯方式，参考了就明白了
@@ -1152,6 +1171,8 @@ def backtrack(路径, 选择列表):
 
 16. [78. Subsets](https://leetcode.cn/problems/subsets/)
 
+    子集问题是一定要排序的
+
     方法一：回溯递归法。不需要设置插入条件，因为每一次我都插入进去
 
     方法二：迭代法。用二进制的方式来表示每一个子串，其中n个长度的集合有 2^n 种情况
@@ -1160,11 +1181,37 @@ def backtrack(路径, 选择列表):
 
     因为会出现重复的元素，所以最好是经过排序后再来处理，同时添加一个判断前后是否一致，只加入第一次
 
-17. 
+17. [491. Non-decreasing Subsequences](https://leetcode.cn/problems/non-decreasing-subsequences/)
 
-18. 
+    用到了哈希表：这是**本题最不同的一点：对于每一层而言，只允许出现当前元素一次（将used表定义在for循环里，对每一层作防止重复的校验，属于横向遍历去重）**，但如果是别的值相同的元素，还是允许加入的！
 
-19. 
+    优化：用数组代替哈希表
+
+    [46. Permutations](https://leetcode.cn/problems/permutations/)
+
+    全排列无需用start下标来标记从哪开始，每次都是从0开始，但需要一个数组used来表示哪个地方访问过，哪个地方没有。**注意：全排列的used是用来标记深度遍历的元素是否重复的问题，所以是需要放在for外面，通过参数传递的**
+
+    [47. Permutations II](https://leetcode.cn/problems/permutations-ii/)
+
+    本题是元素有重复的情况，就需要去重了：当上一个值访问过后，且当前值和上一个值一样的话，就不符合条件（不加入，因为会出现重复的情况）
+
+18. [332. Reconstruct Itinerary](https://leetcode.cn/problems/reconstruct-itinerary/)
+
+    1. carl的回溯法解决，思路是正确的，但是超时通过不了：使用unordered_map<出发机场, map<到达机场, 航班次数>> targets 来进行记录（需要初始化），同时设置回溯的返回值（本题是找到任意一条满足条件的），针对有航班次数的（>0），进行插入和回溯操作
+    2. 原回溯方法已超时，故要**用欧拉路径来解决这种图的问题**：
+       1.定义一个哈希表，对于每一个起始节点，他都用一个优先级队列来保存，而且按照小顶堆的方式（这样能确保每次都是拿的字符最小的），同时要保存他的所有的变（出度）。
+       2.只有当当前节点是其中一个起始节点且它还有没有访问过的终点时，就继续深度搜索，因为我们的目标是逆序的存入栈，也就是要先找到“死胡同”的地方，这样好确定我们到底该走哪条路才能实现“一笔画”。
+       3.逆序后的结果才是题目要求的结果（前面逆序插入了）
+
+19. [51. N-Queens](https://leetcode.cn/problems/n-queens/)
+
+    1. 自己写的思路大致是正确的，但是一些细节问题上处理不对，依靠ai的纠正还是写出来了：
+               1.根据 n，构造n行n列的棋盘，同时放置n个皇后，且皇后在的位置不能在别的皇后的攻击距离
+               2.难点就在于如何根据皇后的攻击距离（皇后所在的行和列以及主斜边和副斜边）
+               3.行和列可以通过是否i 和 j有任何一个相等的，而斜边可以根据 两个i 和 两个j 的绝对值是否都相等 来判断
+               4.那么现在的问题是如何保存已经加入的棋子的这些 i 和 j——用vector来保存
+    2. 另一种写法，内存消耗会更低：无需构造每次暂时的t，只需构造好n x n的棋盘，之后根据回溯来看皇后适合放在哪个位置，会更加符合回溯模板
+    3. 抄的：基于位运算的回溯，可以讲对判断的复杂度从O（n）降到O（1）
 
 20. 
 
