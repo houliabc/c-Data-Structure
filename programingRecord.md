@@ -1213,17 +1213,54 @@ def backtrack(路径, 选择列表):
     2. 另一种写法，内存消耗会更低：无需构造每次暂时的t，只需构造好n x n的棋盘，之后根据回溯来看皇后适合放在哪个位置，会更加符合回溯模板
     3. 抄的：基于位运算的回溯，可以讲对判断的复杂度从O（n）降到O（1）
 
-20. 
+20. [37. Sudoku Solver](https://leetcode.cn/problems/sudoku-solver/)
 
-21. 
+    1. 参考了回溯的算法后自行完成了检查元素的函数。本题是找到唯一解，故用bool返回值的回溯，且本次是训练一来第一次用到两层for的（三层）
+    2. 优化了一下：将3x3的多个if判断改为了区间对齐后用两层for的方式
 
-22. 
+    回溯完结了，到今天，共花费9天时间，明天开始正式步入贪心算法
 
-23. 
+    ![img](https://houlir2.dpdns.org/2025/10/6f1906ca0132a935ea8da094390658d5.png)
 
-24. 
+21. ### 贪心算法
 
-25. 
+    [455. Assign Cookies](https://leetcode.cn/problems/assign-cookies/)
+
+    1. 分发饼干的问题，我会想到每次将饼干分给所需饼干最少的孩子，这样应该可以尽可能的给到更多的孩子那
+    2. 先满足胃口大的贪心方法
+
+22. [376. Wiggle Subsequence](https://leetcode.cn/problems/wiggle-subsequence/)
+
+    在参考了gpt和答案后理解的，一开始想着是用for循环的方式的这种错误的解法。思路是：贪心的每次选取最高峰和最低峰（即一个升序或降序的头和尾），而当平坡的时候就选取这一段的第一个或最后一个元素
+
+    ### 动态规划DP
+
+    > 二者区别：**动规是由前一个状态推导出来的，而贪心是局部直接选最优的**
+
+    **这五步都搞清楚了，才能说把动态规划真的掌握了！**
+
+    1. 确定dp数组（dp table）以及下标的含义
+    2. 确定递推公式
+    3. dp数组如何初始化
+    4. 确定遍历顺序
+    5. 举例推导dp数组
+
+    [509. Fibonacci Number](https://leetcode.cn/problems/fibonacci-number/)
+
+23. [376. Wiggle Subsequence](https://leetcode.cn/problems/wiggle-subsequence/)
+
+    重新复习了一遍并且学习了递归下的写法，会感觉比较困难
+
+24. [53. Maximum Subarray](https://leetcode.cn/problems/maximum-subarray/)
+
+    用到贪心，一层循环即可完成，只需对每一段连续的子序列去看是否是最大值，同时如果当前的连续序列是负值的情况下，就直接清0，从下一段序列开始
+
+25. [53. Maximum Subarray](https://leetcode.cn/problems/maximum-subarray/)
+
+    继续研究昨天内容
+
+    1. dp的方式，来套模板
+    2. 
 
 26. 
 

@@ -357,6 +357,14 @@ struct TreeNode {
 2. **确定终止条件：** 写完了递归算法, 运行的时候，经常会遇到栈溢出的错误，就是没写终止条件或者终止条件写的不对，操作系统也是用一个栈的结构来保存每一层递归的信息，如果递归没有终止，操作系统的内存栈必然就会溢出。
 3. **确定单层递归的逻辑：** 确定每一层递归需要处理的信息。在这里也就会重复调用自己来实现递归的过程。
 
+### 递归返回值
+
+递归函数什么时候需要返回值？什么时候不需要返回值？这里总结如下三点：
+
+- 如果需要**搜索整棵二叉树且不用处理递归返回值，递归函数就不要返回值**。（这种情况就是本文下半部分介绍的[113.路径总和ii](https://leetcode.cn/problems/path-sum-ii/description/)）
+- 如果需要**搜索整棵二叉树且需要处理递归返回值，递归函数就需要返回值**。 （这种情况我们在[236. 二叉树的最近公共祖先 (opens new window)](https://programmercarl.com/0236.二叉树的最近公共祖先.html)中介绍）
+- 如果要**搜索其中一条符合条件的路径，那么递归一定需要返回值，因为遇到符合条件的路径了就要及时返回**。（本题的情况：[112. Path Sum](https://leetcode.cn/problems/path-sum/)）
+
 ### 深度优先遍历
 
 这是图里的叫法，分为前序中序后序
@@ -572,7 +580,299 @@ struct TreeNode {
    };
    ```
 
-   
+## 线段树
+
+主要用来**解决最大区间和，最大子段和，最长连续上升子序列的问题**。可以将$\Omicron(n)$的复杂度降为O(logn)。
+
+线段树可以算作一种数据结构，不算具体的算法。是一种二叉树，对于一个线段（区间）而言，用二叉树来表示，如：
+
+![在这里插入图片描述](https://houlir2.dpdns.org/2025/10/e4ec587583428283dc6210d4d2a0d8eb.png)
+
+### 建树
+
+我们设一个结构体 `tree`，`tree[i].l` 与 `tree[i].r` 分别表示这个点代表的线段的左右下标，`tree[i].sum` 表示这个节点表示的线段和。
+
+```cpp
+// 线段树节点存储的区间信息
+struct Status {
+    int lSum;  // 以左端点为起点的最大子段和
+    int rSum;  // 以右端点为终点的最大子段和
+    int mSum;  // 区间内的最大子段和
+    int iSum;  // 区间总和
+};
+
+// 递归建树
+void build(int i, int l, int r) {
+    tree[i].l = l;
+    tree[i].r = r;
+    // 如果当前是叶子节点，l == r == nullptr
+    if (l == r) {
+        // l 和 r 才是原始数据 nums 的索引范围。
+        tree[i].sum = nums;
+        return;
+    }
+    int mid = (l + r) >> 1;
+    // 递归构造左右子树
+    build(i << 1, l, mid);
+    build((i << 1) + 1, mid + 1, r);
+    // 当前区间和为左右子区间的总和
+    tree[i].sum = tree[i << 1].sum + tree[(i << 1) + 1].sum;
+}
+```
+
+### 无pushdown的线段树
+
+#### 区间查询
+
+线段树的查询方法：
+
+1. 如果这个区间**被完全包括在目标区间里面**，直接返回这个区间的值
+2. 如果没有交集，返回0
+3. 如果这个区间的**左儿子和目标区间有交集**，那么搜索左儿子
+4. 如果这个区间的**右儿子和目标区间有交集**，那么搜索右儿子
+
+```cpp
+int search(int i, int l, int r) {
+    // 情况1：
+    if (tree[i].l >= l && tree[i].r <= r)
+        return tree[i].sum;
+    // 情况2：
+    if （tree[i].l < l || tree[i].r > r）
+    int s = 0;
+    
+    // 情况3：
+    if (tree[i << 1].r >= l)
+        s += search(i << 1, l, r);
+    // 情况4：
+   	if (tree[(i << 1) + 1].l <= r)
+        s += search((i << 1) + 1, r);
+    return s;
+}
+```
+
+#### 单点修改
+
+然后,我们怎么修改这个区间的单点，其实这个相对简单很多，你要把区间的第index位加上k。
+
+那么你从根节点开始，看这个index是在左儿子还是在右儿子，在哪往哪跑，
+
+然后返回的时候，还是按照`tree[i].sum=tree[i*2].sum+tree[i*2+1].sum`的原则，更新所有路过的点
+
+![在这里插入图片描述](https://houlir2.dpdns.org/2025/10/94bd65a50184567517b1c1445b8b30b9.png)
+
+```cpp
+void add(int i, int index, int k) {
+    // 如果是叶子节点说明找到了，对齐进行修改：
+    if (tree[i].l == tree[i].r) {
+        tree[i].sum += k;
+        return;
+    }
+    // 如果没找到，那就去找左右子树，看他在哪里
+    // 左
+    if (index < tree[i << 1].r)
+        add(i << 1, index, k);
+    // 右
+    else
+        add((i << 1) + 1, index, k);
+    // 返回更新上面的值
+    tree[i].sum = tree[i << 1].sum + tree[(i << 1) + 1].sum;
+    return;
+}
+```
+
+#### 区间修改
+
+区间修改和单点查询，我们的思路就变为：**如果把这个区间加上 k  ，相当于把这个区间涂上一个 k  的标记，然后单点查询的时候，就从上跑到下，把沿路的标记加起来就好**。
+
+这里面给区间贴标记的方式与上面的区间查找类似，原则还是那三条，只不过**第一条：如果这个区间被完全包括在目标区间里面，直接返回这个区间的值变为了如果这个区间如果这个区间被完全包括在目标区间里面，则加上这个区间标记 k **
+
+```cpp
+void modify(int i, int l, int r, int k) {
+    // 表示完全包含于[l, r]区间
+    if (tree[i] >= r && tree[i] <= l) {
+        tree[i].sum += k;
+        return;
+    }
+    int mid = (tree[i].l + tree[i].r) >> 1;
+    // 左区间包含，就相应修改左区间
+    if (l <= mid)
+        modify(i << 1, l, r, k);
+    if (mid + 1 <= r)  // 等价于 mid < r
+        // 等价于 x * 2 + 1
+        modify(p << 1 | 1, l, r, k);
+}
+
+// 方法二：不用mid
+void modify(int i, int l, int r, int k) {
+    if (tree[i] >= r && tree[i] <= l) {
+        tree[i].sum += k;
+        return;
+    }
+    if (l <= tree[i << 1])
+        modify(i << 1, l, r, k);
+    if (tree[i << 1 | 1] <= r) 
+        modify(p << 1 | 1, l, r, k);
+}
+```
+
+
+
+#### 单点查询
+
+然后就是单点查询了，这个更好理解了，就是index在哪往哪跑，**把路径上所有的标价加上**就好了，是对于区间修改后的，需要向上去回溯修改的情况
+
+```cpp
+void query(int i, int index) {
+    // 将一路上区间修改后的未进行回溯修改的元素，在这里进行统一的处理
+    res += tree[i].sum;
+    // 如果是叶子就结束
+    if (tree[i].l == tree[i].r)
+        return;
+   int mid = (tree[i].l + tree[i].r) >> 1;
+    if (index <= mid)
+        query(i << 1, index);
+    else 
+        query(i << 1 | 1, index);
+}
+```
+
+> **为什么需要把路上的 sum  加起来：**
+>
+> 因为我们在进行区间修改的时候，若当前区间已经被完全包含在目标区间 [ l , r ] [l,r][*l*,*r*] 里，直接将该区间 `tree[i].num += k`，不需要再继续往下走了，类似 lazy 标记，所以单点查询的时候要再加上路径上的值（即原本的权值再加上经过的若干次修改的值才是这个单点的值）。
+
+#### 区间修改，单点查询完整代码
+
+洛谷 [P3368 【模板】树状数组 2](https://www.luogu.com.cn/problem/P3368)：
+
+```cpp
+#include <bits/stdc++.h>
+using namespace std;
+const int maxn = 5e5 + 7;
+
+int n, m, s, t;
+int ans;
+int a[maxn];
+struct segment_tree
+{	
+	struct node
+	{
+		int l, r;
+		int num;
+	}tr[maxn * 4];
+	
+	void build(int p, int l, int r)
+	{
+		tr[p] = {l, r, 0};
+		if(l == r) {
+			tr[p].num = a[l];
+			return ;
+		}
+		int mid = l + r >> 1;
+		build(p << 1, l, mid);
+		build(p << 1 | 1, mid + 1, r);
+	}		
+	
+	void modify(int p, int l, int r, int k) 
+	{
+		if(tr[p].l >= l && tr[p].r <= r) {
+			tr[p].num += k;
+			return ;
+		}
+		int mid = tr[p].l + tr[p].r >> 1;
+		if(l <= mid) modify(p << 1, l, r, k);
+		if(r > mid) modify(p << 1 | 1, l, r, k);
+	}
+	
+	void query(int p, int x)
+	{
+		ans += tr[p].num;
+		if(tr[p].l == tr[p].r) return;
+		int mid = tr[p].l + tr[p].r >> 1;
+		if(x <= mid) query(p << 1, x);
+		else query(p << 1 | 1, x); 
+	}
+}ST;
+
+int main()
+{
+	cin >> n >> m;
+	for (int i = 1; i <= n; ++ i) {
+	    scanf("%d", &a[i]);
+	}
+	ST.build(1, 1, n);
+    for (int i = 1; i <= m; ++ i) {
+        int c;
+        scanf("%d", &c);
+        if(c == 1) {
+            int x, y, z;
+            scanf("%d%d%d", &x, &y, &z);
+            ST.modify(1, x, y, z);
+        }
+        else {
+            ans = 0;
+            int x;
+            scanf("%d", &x);
+            ST.query(1, x);
+            printf("%d\n", ans);
+        }
+    }
+	return 0;
+}
+/*
+int main()
+{
+	n = 100;
+	for (int i = 1; i <= n; ++ i) {
+		a[i] = i;
+	}
+	ST.build(1, 1, n);
+	m = 10;
+	for (int i = 1; i <= m; ++ i) {
+		int l = 1, r = 100;
+		ST.modify(1, l, r, 10000);
+		ans = 0;
+		// query(p, x), p = 1, x 为想要查询的点的下标
+		ST.query(1, 50); // 单点查询 下标为 50 的点的值，ans = 50 + 10000 * i
+		cout << i << " " << ans << '\n';
+		ans = 0;
+		ST.query(1, 100); // 单点查询 ans = 100 + 10000 * i
+		cout << i << " " << ans << '\n'; 
+	}
+	return 0;
+}
+*/
+
+```
+
+#### 区间修改与区间查询
+
+是不能直接将区间修改和区间查询组合在一起的，这时候就需要添加`懒标记lazytag`来记录区间的标记
+
+> **懒标记（Lazy Tag）** 是一种**延迟更新**技术，核心作用是**减少不必要的递归操作，优化区间更新的效率**。
+>
+> 懒标记的思路是：**当更新一个区间时，如果当前节点的区间完全被目标区间包含，就不继续递归更新其子节点，而是在当前节点记录一个 “待更新标记”（即懒标记），表示 “该节点的所有子节点需要执行这个更新，但暂时先不执行”**。等到后续需要查询或更新该节点的子节点时，再把这个标记 “下放”（`pushDown`）到子节点，完成实际的更新。
+>
+> 这样可以**把多次对同一区间的更新合并，减少递归次数**，确保区间更新和查询的时间复杂度始终保持 `O(log n)`。
+
+**区间修改的时候，我们按照如下原则：**
+
+1. 如果当前**区间被完全覆盖在目标区间**里，将这个区间的 `sum + k * (tree[i].r - tree[i].l + 1)`
+
+   也就是**加上这个子区间里要修改的个数乘修改的值即可**
+
+2. 如果**没有完全覆盖，则先下传懒标记**
+
+3. 如果这个区间的左儿子和目标区间有交集，那么搜索左儿子
+
+4. 如果这个区间的右儿子和目标区间有交集，那么搜索右儿子
+
+然后查询的时候，将这个懒标记下传就好了，下面图解一下：
+
+如图，区间 1 ∼ 4 分别是 1 、 2 、 3 、 4 ，我们要把 1 ∼ 3 区间 + 1 。因为 1 ∼ 2 区间被完全覆盖，所以将其 + 2 （1~2区间的父节点），并将紫色的 lazytag + 1，3 区间同理
+
+![在这里插入图片描述](https://houlir2.dpdns.org/2025/10/7e046fce3b2d27a12423d892d67be214.png)
+
+## 树总结
 
 ![img](https://houlir2.dpdns.org/2025/10/205934d55294ca715995e46c00705ca6.png)
 
@@ -635,6 +935,42 @@ private:
 其中，for表示横向遍历（也就是树中孩子个数），回溯递归就是竖向遍历（树的深度）
 
 ![回溯算法理论基础](https://houlir2.dpdns.org/2025/10/180ebfb7736ebf037db9ce9359feba7a.png)
+
+## 回溯算法的返回值
+
+递归函数什么时候需要返回值？什么时候不需要返回值？这里总结如下三点：
+
+- 如果需要**搜索整棵二叉树且不用处理递归返回值，递归函数就不要返回值**。（这种情况就是本文下半部分介绍的[113.路径总和ii](https://leetcode.cn/problems/path-sum-ii/description/)）
+- 如果需要**搜索整棵二叉树且需要处理递归返回值，递归函数就需要返回值**。 （这种情况我们在[236. 二叉树的最近公共祖先 (opens new window)](https://programmercarl.com/0236.二叉树的最近公共祖先.html)中介绍）
+- 如果要**搜索其中一条符合条件的路径，那么递归一定需要返回值，因为遇到符合条件的路径了就要及时返回**。（本题的情况：[112. Path Sum](https://leetcode.cn/problems/path-sum/)）
+
+## 回溯总结
+
+![img](https://houlir2.dpdns.org/2025/10/6f1906ca0132a935ea8da094390658d5.png)
+
+# 贪心算法
+
+贪心算法没有固定的套路，主要是需要自己尝试一下，能不能在某些地方去进行贪心，一个问题能用贪心解决，必须满足三个核心条件：
+
+- **最优子结构**：全局最优解**包含子问题的最优解**（这一点和动态规划一致）。
+- **贪心选择性质**：**全局最优解可以通过一系列 “局部最优选择” 得到**（即不考虑未来决策，只选当前最优，最终能拼出全局最优）。
+- 找不到任何的反例是不符合上述条件的
+
+如一些`最`的问题上，比如最短路径，最大字数组合等
+
+# 动态规划DP
+
+## 模板
+
+> 二者区别：**动规是由前一个状态推导出来的，而贪心是局部直接选最优的**
+
+**这五步都搞清楚了，才能说把动态规划真的掌握了！**
+
+1. 确定dp数组（dp table）以及下标的含义
+2. 确定递推公式
+3. dp数组如何初始化（需要根据地推公式来决定如何初始化）
+4. 确定遍历顺序（从前往后/从后往前）
+5. 举例推导dp数组（草稿纸验证）
 
 # C++ 标准库
 
@@ -959,8 +1295,8 @@ priority_queue<pair<int, int>, std::vector<pair<int, int>>,
                std::greater<pair<int, int>>>
     q;
 ... while (!q.empty()) {
-  // dis为入堆时节点到起点的距离，i为节点编号
-  int dis = q.top().first, i = q.top().second;
+  // index为入堆时节点到起点的距离，i为节点编号
+  int index = q.top().first, i = q.top().second;
   q.pop();
   ...
 }
