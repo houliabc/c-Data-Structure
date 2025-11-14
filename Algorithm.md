@@ -590,19 +590,18 @@ struct TreeNode {
 
 ### 建树
 
-我们设一个结构体 `tree`，`tree[i].l` 与 `tree[i].r` 分别表示这个点代表的线段的左右下标，`tree[i].sum` 表示这个节点表示的线段和。
+我们设一个结构体 `tree`，`tree[i].l` 与 `tree[i].r` 分别表示这个点代表的线段的左右下标，`tree[i].sum` 表示这个节点表示的线段和，`tree[i].lazy`表示这个节点的懒标记。
 
 ```cpp
 // 线段树节点存储的区间信息
-struct Status {
-    int lSum;  // 以左端点为起点的最大子段和
-    int rSum;  // 以右端点为终点的最大子段和
-    int mSum;  // 区间内的最大子段和
-    int iSum;  // 区间总和
-};
+struct node {
+    long l,r,sum,lz;
+} tree[N];
+long nums[N];
 
 // 递归建树
 void build(int i, int l, int r) {
+    tree[i].lazy = 0;
     tree[i].l = l;
     tree[i].r = r;
     // 如果当前是叶子节点，l == r == nullptr
@@ -632,6 +631,7 @@ void build(int i, int l, int r) {
 4. 如果这个区间的**右儿子和目标区间有交集**，那么搜索右儿子
 
 ```cpp
+// 区间查询
 int search(int i, int l, int r) {
     // 情况1：
     if (tree[i].l >= l && tree[i].r <= r)
@@ -661,6 +661,7 @@ int search(int i, int l, int r) {
 ![在这里插入图片描述](https://houlir2.dpdns.org/2025/10/94bd65a50184567517b1c1445b8b30b9.png)
 
 ```cpp
+// 单点修改
 void add(int i, int index, int k) {
     // 如果是叶子节点说明找到了，对齐进行修改：
     if (tree[i].l == tree[i].r) {
@@ -687,6 +688,7 @@ void add(int i, int index, int k) {
 这里面给区间贴标记的方式与上面的区间查找类似，原则还是那三条，只不过**第一条：如果这个区间被完全包括在目标区间里面，直接返回这个区间的值变为了如果这个区间如果这个区间被完全包括在目标区间里面，则加上这个区间标记 k **
 
 ```cpp
+// 区间修改
 void modify(int i, int l, int r, int k) {
     // 表示完全包含于[l, r]区间
     if (tree[i] >= r && tree[i] <= l) {
@@ -715,6 +717,145 @@ void modify(int i, int l, int r, int k) {
 }
 ```
 
+#### 代码及题
+
+[P3374 【模板】树状数组 1](https://www.luogu.com.cn/problem/P3374)
+
+```cpp
+#include <iostream>
+#include <cstdio>
+#include <algorithm>
+#include <cstring>
+#include <cmath>
+#include <cstdlib>
+#include <queue>
+#include <stack>
+#include <vector>
+using namespace std;
+#define MAXN 100010
+#define INF 10000009
+#define MOD 10000007
+#define LL long long
+#define in(a) a=read()
+#define REP(i,k,n) for(long long i=k;i<=n;i++)
+#define DREP(i,k,n) for(long long i=k;i>=n;i--)
+#define cl(a) memset(a,0,sizeof(a))
+inline long long read(){
+    long long x=0,f=1;char ch=getchar();
+    for(;!isdigit(ch);ch=getchar()) if(ch=='-') f=-1;
+    for(;isdigit(ch);ch=getchar()) x=x*10+ch-'0';
+    return x*f;
+}
+inline void out(long long x){
+    if(x<0) putchar('-'),x=-x;
+    if(x>9) out(x/10);
+    putchar(x%10+'0');
+}
+long long n,m,p;
+long long input[MAXN];
+struct node{
+    long long l,r;
+    long long sum,mlz,plz;
+}tree[4*MAXN];
+inline void build(long long i,long long l,long long r){
+    tree[i].l=l;
+    tree[i].r=r;
+    tree[i].mlz=1;
+    if(l==r){
+        tree[i].sum=input[l]%p;
+        return ;
+    }
+    long long mid=(l+r)>>1;
+    build(i<<1,l,mid);
+    build(i<<1|1,mid+1,r);
+    tree[i].sum=(tree[i<<1].sum+tree[i<<1|1].sum)%p;
+    return ;
+}
+inline void pushdown(long long i){
+    long long k1=tree[i].mlz,k2=tree[i].plz;
+    tree[i<<1].sum=(tree[i<<1].sum*k1+k2*(tree[i<<1].r-tree[i<<1].l+1))%p;
+    tree[i<<1|1].sum=(tree[i<<1|1].sum*k1+k2*(tree[i<<1|1].r-tree[i<<1|1].l+1))%p;
+    tree[i<<1].mlz=(tree[i<<1].mlz*k1)%p;
+    tree[i<<1|1].mlz=(tree[i<<1|1].mlz*k1)%p;
+    tree[i<<1].plz=(tree[i<<1].plz*k1+k2)%p;
+    tree[i<<1|1].plz=(tree[i<<1|1].plz*k1+k2)%p;
+    tree[i].plz=0;
+    tree[i].mlz=1;
+    return ;
+}
+inline void mul(long long i,long long l,long long r,long long k){
+    if(tree[i].r<l || tree[i].l>r)  return ;
+    if(tree[i].l>=l && tree[i].r<=r){
+        tree[i].sum=(tree[i].sum*k)%p;
+        tree[i].mlz=(tree[i].mlz*k)%p;
+        tree[i].plz=(tree[i].plz*k)%p;
+        return ;
+    }
+    pushdown(i);
+    if(tree[i<<1].r>=l)  mul(i<<1,l,r,k);
+    if(tree[i<<1|1].l<=r)  mul(i<<1|1,l,r,k);
+    tree[i].sum=(tree[i<<1].sum+tree[i<<1|1].sum)%p;
+    return ;
+}
+inline void add(long long i,long long l,long long r,long long k){
+    if(tree[i].r<l || tree[i].l>r)  return ;
+    if(tree[i].l>=l && tree[i].r<=r){
+        tree[i].sum+=((tree[i].r-tree[i].l+1)*k)%p;
+        tree[i].plz=(tree[i].plz+k)%p;
+        return ;
+    }
+    pushdown(i);
+    if(tree[i<<1].r>=l)  add(i<<1,l,r,k);
+    if(tree[i<<1|1].l<=r)  add(i<<1|1,l,r,k);
+    tree[i].sum=(tree[i<<1].sum+tree[i<<1|1].sum)%p;
+    return ;
+}
+inline long long search(long long i,long long l,long long r){
+    if(tree[i].r<l || tree[i].l>r)  return 0;
+    if(tree[i].l>=l && tree[i].r<=r)
+        return tree[i].sum;
+    pushdown(i);
+    long long sum=0;
+    if(tree[i<<1].r>=l)  sum+=search(i<<1,l,r)%p;
+    if(tree[i<<1|1].l<=r)  sum+=search(i<<1|1,l,r)%p;
+    return sum%p;
+}
+int main(){
+    in(n);    in(m);in(p);
+    REP(i,1,n)  in(input[i]);
+    build(1,1,n); 
+
+    REP(i,1,m){
+        long long fl,a,b,c;
+        in(fl);
+        if(fl==1){
+            in(a);in(b);in(c);
+            c%=p;
+            mul(1,a,b,c);
+        }
+        if(fl==2){
+            in(a);in(b);in(c);
+            c%=p;
+            add(1,a,b,c);
+        }
+        if(fl==3){
+            in(a);in(b);
+            printf("%lld\n",search(1,a,b));
+        }
+    }
+    return 0;
+}
+/*
+5 4 1000
+1 2 3 4 5
+3 1 5
+2 1 5 1
+1 1 5 2
+
+3 1 5
+*/ 
+```
+
 
 
 #### 单点查询
@@ -722,6 +863,7 @@ void modify(int i, int l, int r, int k) {
 然后就是单点查询了，这个更好理解了，就是index在哪往哪跑，**把路径上所有的标价加上**就好了，是对于区间修改后的，需要向上去回溯修改的情况
 
 ```cpp
+// 单点查询
 void query(int i, int index) {
     // 将一路上区间修改后的未进行回溯修改的元素，在这里进行统一的处理
     res += tree[i].sum;
@@ -740,7 +882,7 @@ void query(int i, int index) {
 >
 > 因为我们在进行区间修改的时候，若当前区间已经被完全包含在目标区间 [ l , r ] [l,r][*l*,*r*] 里，直接将该区间 `tree[i].num += k`，不需要再继续往下走了，类似 lazy 标记，所以单点查询的时候要再加上路径上的值（即原本的权值再加上经过的若干次修改的值才是这个单点的值）。
 
-#### 区间修改，单点查询完整代码
+#### 代码及题
 
 洛谷 [P3368 【模板】树状数组 2](https://www.luogu.com.cn/problem/P3368)：
 
@@ -844,7 +986,9 @@ int main()
 
 ```
 
-#### 区间修改与区间查询
+### pushdown的线段树（lazy标记）
+
+#### 区间修改
 
 是不能直接将区间修改和区间查询组合在一起的，这时候就需要添加`懒标记lazytag`来记录区间的标记
 
@@ -868,9 +1012,321 @@ int main()
 
 然后查询的时候，将这个懒标记下传就好了，下面图解一下：
 
-如图，区间 1 ∼ 4 分别是 1 、 2 、 3 、 4 ，我们要把 1 ∼ 3 区间 + 1 。因为 1 ∼ 2 区间被完全覆盖，所以将其 + 2 （1~2区间的父节点），并将紫色的 lazytag + 1，3 区间同理
+如图，区间 1 ∼ 4 分别是 1 、 2 、 3 、 4 ，我们要把 1 ∼ 3 区间 + 1 。因为 1 ∼ 2 区间被完全覆盖，所以将其 + 2 （1~2区间的父节点），并将**紫色的 lazytag** + 1，3 区间同理
 
 ![在这里插入图片描述](https://houlir2.dpdns.org/2025/10/7e046fce3b2d27a12423d892d67be214.png)
+
+> 这里在线段【1,2】的紫色lazytag + 1 是因为之后查询的时候要将它所有孩子节点都 + 1，所以叫做pushdown。线段【3,3】同理，因为【3,3】 仅仅是【3,4】的一部分，所以这个懒标记只能标记到3那（因为懒标记是标记对所有孩子的处理，而【4,4】不需要处理）
+
+```cpp
+// 区间修改
+void add(int i, int l, int r, int k) {
+    // 完全覆盖
+    if (tree[i].l >= l && tree[i].r <= r) {
+        tree[i].sum += k * (tree[i].r - tree[i].l + 1);
+        // 记录懒标记，其值为需要将所有孩子节点加的值
+        tree[i].lazy += k;
+        return;
+    }
+    // 向下传递
+    push_down(i);
+    if (tree[i << 1].r >= l)
+        add(i << 1, l, r, k);
+    if (tree[i * 2 + 1].l <= r)
+        add(i * 2 + 1, l, r, k);
+    tree[i].sum = tree[i << 1].sum + tree[i * 2 + 1].sum;
+}
+
+
+
+// push_down就是将lazy标志归零，同时自己加上 k * ( r - l + 1)，而每个孩子加上k
+void push_down(int i) {
+    if (tree[i].lazy != 0) {
+        // 先让左右儿子先加
+        tree[i << 1].sum += tree[i].lazy;
+        tree[i * 2 + 1].sum += tree[i].lazy;
+        // 使左右分别求和加起来
+        int mid = (tree[i].l + tree[i].r) >> 1;
+        // 左孩子的范围是【左孩子.l，左右孩子的中间值】
+        tree[i << 1].sum += tree[i].lazy * (mid - tree[i * 2].l + 1);
+        // 同理，右孩子：【左右孩子中间值 + 1，右孩子.r】
+        tree[i * 2 + 1].sum += tree[i].lazy * (tree[i * 2 + 1].r - mid);  // 这里之所以不用 +1 是因为 mid 的 +1 与 -1 低效了
+        // 懒标记已使用，归零
+        tree[i].lazy = 0;
+    }
+}
+```
+
+#### 区间查询
+
+区间查询的情况也要像修改一样进行pushdown，这里用图模拟一下。我们要查询 2 ∼ 4区间的和，这是**查询前**的情况（**此时非叶子节点的懒标记的值已经修改过了（区间修改后的值），但是它的子节点都还没修改，这时就是在查询的时候进行的修改**），所有**紫色的代表 lazytag，红色表示值，蓝色表示区间序号**
+
+![在这里插入图片描述](https://houlir2.dpdns.org/2025/10/59b77800c67efd4898c40b8e25273781.png)
+
+然后，我们查到区间 **1 ∼ 2时，发现这个区间并没有被完全包括在目标区间里，于是我们就pushdown，lazytag下传**，并让每个区间 sum 加上 ( r − l ) × lazytag 。
+
+![在这里插入图片描述](https://houlir2.dpdns.org/2025/10/8bce838aa79434169f7e9682e03fbece.png)
+
+然后查到 2 ∼ 2区间，发现被完全包含，所以就返 3 ，再搜索到 3 ∼ 4  区间，发现被完全包含，那么直接返回 8，最后 3 + 8 = 11 就是答案
+
+```cpp
+int search(int i, int l, int r) {
+    if (tree[i].l >= l && tree[i].r <= r)
+        return tree[i].sum;
+    if (tree[i].r < l || tree[i].l > r)
+        return 0;
+    push_down(i);
+    int s = 0;
+    if (tree[i << 1].r >= l)
+        s += search(i << 1, l, r);
+    if (tree[i * 2 + 1].l <= r)
+        s += search(i * 2 + 1, l, r);
+    return s;
+}
+```
+
+#### 代码和题
+
+[P3372 【模板】线段树 1](https://www.luogu.com.cn/problem/P3372)
+
+```cpp
+#include<bits/stdc++.h>
+using namespace std;
+typedef long long ll;
+const ll N=1e6+7;
+const ll mod=2147483647;
+ll n,m;
+struct node
+{
+    ll l,r,sum,lz;
+}tree[N];
+ll arr[N];
+void build(ll i,ll l,ll r,ll arr[])
+{
+    tree[i].lz=0;//初始化的时候肯定都是0
+    tree[i].l=l;
+    tree[i].r=r;
+    if(l==r)
+    {
+        tree[i].sum=arr[l];//到达底部单节点才把输入的值赋给你
+        return ;
+    }
+    ll mid=(l+r)/2;
+    build(i*2,l,mid,arr);
+    build(i*2+1,mid+1,r,arr);
+    tree[i].sum=tree[i*2].sum+tree[i*2+1].sum;//树已经全部建完了，再从下往上+++，使得上层的树都有了值
+    return ;
+}
+inline void push_down(ll i)
+{
+    if(tree[i].lz!=0)
+    {
+        tree[i*2].lz+=tree[i].lz;
+        tree[i*2+1].lz+=tree[i].lz;
+        ll mid=(tree[i].l+tree[i].r)/2;
+        tree[i*2].sum+=tree[i].lz*(mid-tree[i*2].l+1);
+        tree[i*2+1].sum+=tree[i].lz*(tree[i*2+1].r-mid);
+        tree[i].lz=0;
+    }
+    return ;
+}
+inline void add(ll i,ll l,ll r,ll k)
+{
+    if(tree[i].l>=l&&tree[i].r<=r)
+    {
+        tree[i].sum+=k*(tree[i].r-tree[i].l+1);
+        tree[i].lz+=k;
+        return ;
+    }
+    push_down(i);
+    if(tree[i*2].r>=l)
+        add(i*2,l,r,k);
+    if(tree[i*2+1].l<=r)
+        add(i*2+1,l,r,k);
+    tree[i].sum=tree[i*2].sum+tree[i*2+1].sum;
+    return ;
+}
+inline ll searchs(ll i,ll l, ll r)
+{
+    if(tree[i].l>=l&&tree[i].r<=r)
+        return tree[i].sum;
+    push_down(i);
+    ll num=0;
+    if(tree[i*2].r>=l)
+        num+=searchs(i*2,l,r);
+    if(tree[i*2+1].l<=r)
+        num+=searchs(i*2+1,l,r);
+    return num;
+}
+int main()
+{
+    ios::sync_with_stdio(false);
+    cin.tie(0),cout.tie(0);
+    cin>>n>>m;
+    for(int i=1;i<=n;++i)
+        cin>>arr[i];
+    build(1,1,n,arr);//从根节点开始建树
+    for(int i=1;i<=m;++i)
+    {
+        ll tmp;
+        cin>>tmp;
+        if(tmp==1)
+        {
+            ll a,b,c;
+            cin>>a>>b>>c;
+            add(1,a,b,c);//每次修改都是从编号为1开始的，因为编号1是树的顶端，往下分叉
+        }
+        if(tmp==2)
+        {
+            ll a,b;
+            cin>>a>>b;
+            printf("%lld\n",searchs(1,a,b));//编号i的话，每次都是从1开始
+        }
+    }
+    return 0;
+}
+```
+
+
+
+### 乘法线段树
+
+[P3373 【模板】线段树 2](https://www.luogu.com.cn/problem/P3373)
+
+```cpp
+#include<bits/stdc++.h>
+using namespace std;
+typedef long long ll;
+const ll N=1e6+7;
+template<typename T>void read(T &x)
+{
+    x=0;char ch=getchar();ll f=1;
+    while(!isdigit(ch)){if(ch=='-')f=-1;ch=getchar();}
+    while(isdigit(ch)){x=(x<<1)+(x<<3)+(ch^48);ch=getchar();}x*=f;
+}
+ll n,m,arr[N],mod,flag,cn,cm,cw;
+struct node
+{
+    ll l,r,sum,mul,add;//有乘有加，先乘后加
+}tree[N];
+
+inline void build(ll i,ll l,ll r)
+{
+    tree[i].l=l;
+    tree[i].r=r;
+    tree[i].mul=1;
+    if(l==r)
+    {
+        tree[i].sum=arr[l]%mod;
+        return ;
+    }
+    ll mid=(l+r)>>1;
+    build(i*2,l,mid);
+    build(i*2+1,mid+1,r);
+    tree[i].sum=(tree[i*2].sum+tree[i*2+1].sum)%mod;
+}
+inline void push_down(ll i)
+{
+    tree[i*2].sum=(ll)(tree[i].mul*tree[i*2].sum+((tree[i*2].r-tree[i*2].l+1)*tree[i].add)%mod)%mod;
+    tree[i*2+1].sum=(ll)(tree[i].mul*tree[i*2+1].sum+((tree[i*2+1].r-tree[i*2+1].l+1)*tree[i].add)%mod)%mod;
+    tree[i*2].mul=(ll)(tree[i*2].mul*tree[i].mul)%mod;
+    tree[i*2+1].mul=(ll)(tree[i*2+1].mul*tree[i].mul)%mod;
+    tree[i*2].add=(ll)(tree[i*2].add*tree[i].mul+tree[i].add)%mod;
+    tree[i*2+1].add=(ll)(tree[i*2+1].add*tree[i].mul+tree[i].add)%mod;
+    tree[i].mul=1;tree[i].add=0;
+}
+inline void add(ll i,ll l,ll r,ll k)
+{
+    if(tree[i].l>=l&&tree[i].r<=r)
+    {
+        tree[i].add=(ll)(tree[i].add+k)%mod;
+        tree[i].sum=(ll)(tree[i].sum+k*(tree[i].r-tree[i].l+1))%mod;
+        return ;
+    }
+    push_down(i);
+  
+    if(tree[i*2].r>=l)
+        add(i*2,l,r,k);
+    if(tree[i*2+1].l<=r)
+        add(i*2+1,l,r,k);
+    //ll mid=(tree[i].l+tree[i].r)>>1;
+    //if(l<=mid)add(i*2,l,r,k);
+    //if(mid<r)add(i*2+1,l,r,k);
+    tree[i].sum=(tree[i*2].sum+tree[i*2+1].sum)%mod;
+}
+inline void mult(ll i,ll l,ll r,ll k)
+{
+    if(tree[i].l>=l&&tree[i].r<=r)
+    {
+        tree[i].mul=(tree[i].mul*k)%mod;
+        tree[i].add=(tree[i].add*k)%mod;
+        tree[i].sum=(tree[i].sum*k)%mod;
+        return ;
+    }
+    push_down(i);
+  
+    if(tree[i*2].r>=l)
+        mult(i*2,l,r,k);
+    if(tree[i*2+1].l<=r)
+        mult(i*2+1,l,r,k);
+    //ll mid=(tree[i].l+tree[i].r)>>1;
+    //if(l<=mid)mult(i*2,l,r,k);
+    //if(mid<r)mult(i*2+1,l,r,k);
+    tree[i].sum=(tree[i*2].sum+tree[i*2+1].sum)%mod;
+}
+inline ll query(ll i,ll l,ll r)
+{
+    if(tree[i].l>=l&&tree[i].r<=r)
+        return tree[i].sum;
+    push_down(i);
+    ll num=0;
+    if(tree[i*2].r>=l)
+        num=(num+query(i*2,l,r))%mod;
+    if(tree[i*2+1].l<=r)
+        num=(num+query(i*2+1,l,r))%mod;
+    return num;
+    //ll val=0;
+    //ll mid=(tree[i].l+tree[i].r)>>1;
+    //if(l<=mid)val=(val+query(i*2,l,r))%mod;
+    //if(mid<r)val=(val+query(i*2+1,l,r))%mod;
+    //return val;
+}
+int main()
+{
+    read(n),read(m),read(mod);
+    for(int i=1;i<=n;++i)
+        read(arr[i]);
+    build(1,1,n);
+    for(int i=1;i<=m;++i)
+    {
+        read(flag);
+        if(flag==1)
+        {
+            read(cn),read(cm),read(cw);
+            mult(1,cn,cm,cw);
+        }
+        else if(flag==2){
+            read(cn),read(cm),read(cw);
+            add(1,cn,cm,cw);
+        }
+        else {
+            read(cn),read(cm);
+            cout<<query(1,cn,cm)<<endl;
+        }
+    }
+}
+/*
+5 4 1000
+1 2 3 4 5
+3 1 5
+2 1 5 1
+1 1 5 2
+
+3 1 5
+*/ 
+```
+
+### 根号线段树
 
 ## 树总结
 
@@ -957,6 +1413,11 @@ private:
 - 找不到任何的反例是不符合上述条件的
 
 如一些`最`的问题上，比如最短路径，最大字数组合等
+
+严格的数据证明一般有如下两种：
+
+- 数学归纳法
+- 反证法
 
 # 动态规划DP
 

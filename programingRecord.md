@@ -1260,7 +1260,7 @@ def backtrack(路径, 选择列表):
     继续研究昨天内容
 
     1. dp的方式，来套模板
-    2. 
+    2. 方法三：利用线段树这种数据结构来解决的
 
 26. 
 
@@ -1270,11 +1270,65 @@ def backtrack(路径, 选择列表):
 
 29. 
 
-30. 
+30. [122. Best Time to Buy and Sell Stock II](https://leetcode.cn/problems/best-time-to-buy-and-sell-stock-ii/)
 
-31. 
+    贪心算法，低买高卖，累积起来就能赚最多的钱
 
-32. 
+    贪心优化了一下代码长度，逻辑很简单，只需几行代码即可
+
+    动态规划解决，与121的区别在于，前者是只能买一只股，而本题是可以买了股又卖出去的，多买多卖来赚取利益
+
+31. [121. Best Time to Buy and Sell Stock](https://leetcode.cn/problems/best-time-to-buy-and-sell-stock/)
+
+    dp实现，一般dp是一个二重数组，定义两个位置，同时，注意dp是递推式，往往需要根据i的前一个i-1来推出当前的情况，依赖于前者
+
+    贪心算法解决，贪心看来是常用到max、min这些的
+
+    [55. Jump Game](https://leetcode.cn/problems/jump-game/)
+
+    从头开始跳，贪心的选择能够跳跃最远的那一个，而如果能达到表位，则成功
+
+    [45. Jump Game II](https://leetcode.cn/problems/jump-game-ii/)
+
+    用贪心的算法来解决，思路是计算当前位置的最长覆盖范围，当i走到该位置时，若还没走完，则步数+1，并开启下一趟的覆盖范围
+
+## 11月
+
+1.  
+
+2.  
+
+3.  
+
+4.  
+
+5.  
+
+6.  
+
+7.  
+
+8.  
+
+9.  
+
+10.  
+
+11. [1005. Maximize Sum Of Array After K Negations](https://leetcode.cn/problems/maximize-sum-of-array-after-k-negations/)
+
+    在ai的帮助下，完成了贪心的写法
+
+    方法二：按照绝对值排序，就避免了排序后找最小绝对值元素的开销
+
+12. [134. Gas Station](https://leetcode.cn/problems/gas-station/)
+
+    局部贪心到全局贪心的写法
+
+13. [135. Candy](https://leetcode.cn/problems/candy/)
+
+    从前往后的贪心的给分数更高的后者分配糖果；从后往前的贪心给分数更高的前者分配糖果（又贪心的选择了当前糖果和后者加一——max）
+
+14. 
 
 
 
