@@ -1262,13 +1262,13 @@ def backtrack(路径, 选择列表):
     1. dp的方式，来套模板
     2. 方法三：利用线段树这种数据结构来解决的
 
-26. 
+26. 无
 
-27. 
+27. 无
 
-28. 
+28. 无
 
-29. 
+29. 无
 
 30. [122. Best Time to Buy and Sell Stock II](https://leetcode.cn/problems/best-time-to-buy-and-sell-stock-ii/)
 
@@ -1294,25 +1294,25 @@ def backtrack(路径, 选择列表):
 
 ## 11月
 
-1.  
+1. 无
 
-2.  
+2. 无
 
-3.  
+3. 无
 
-4.  
+4. 无
 
-5.  
+5. 无
 
-6.  
+6. 无
 
-7.  
+7. 无
 
-8.  
+8. 无
 
-9.  
+9. 无
 
-10.  
+10. 无
 
 11. [1005. Maximize Sum Of Array After K Negations](https://leetcode.cn/problems/maximize-sum-of-array-after-k-negations/)
 
@@ -1328,13 +1328,150 @@ def backtrack(路径, 选择列表):
 
     从前往后的贪心的给分数更高的后者分配糖果；从后往前的贪心给分数更高的前者分配糖果（又贪心的选择了当前糖果和后者加一——max）
 
-14. 
+14. [860. Lemonade Change](https://leetcode.cn/problems/lemonade-change/)
 
+    分情况讨论
 
+    [452. Minimum Number of Arrows to Burst Balloons](https://leetcode.cn/problems/minimum-number-of-arrows-to-burst-balloons/)
 
+    现在终于知道贪心的逻辑了，**所谓贪心就需要贪心的选择最大或最小的那一项（要用max或min）**，而且是局部达到这种最优，扩散到全局的最优，这正是答案
 
+15. [435. Non-overlapping Intervals](https://leetcode.cn/problems/non-overlapping-intervals/)
 
+    方法一：按右端点排序的情况，贪心算法不需要修改原区间，只需记录「上一个不重叠区间的右端点」，修改区间会破坏后续判断逻辑。
 
+    方法二：按照左端点排序的情况
+
+16. 无
+
+17. 无
+
+18. 无
+
+19. 无
+
+20. 无
+
+21. 无
+
+22. 无
+
+23. 无
+
+24. 无
+
+25. 无
+
+26. 无
+
+27. 无
+
+28. 无
+
+29. [763. Partition Labels](https://leetcode.cn/problems/partition-labels/)
+
+    1. 自己参考了大概的思路写出的版本，效率偏低：1. 先统计每个字母最远的结束下标。2. 遍历的同时统计好当前结束的最远下标，而当当前访问的字母为最远下标时，就是一个分割点
+    2. 按照代码随想录的版本，在最开始的位置贪心，用max选取最大的右边界
+
+30. [56. Merge Intervals](https://leetcode.cn/problems/merge-intervals/)
+
+    大体是我的思路，但是有点bug，用gpt修正了，主要是if写错了，无需跟上一个区间的右边界比，仅需和max比
+    
+    方法二：先加入进去区间，后面针对有更大范围的区间就及时的修改
+
+## 12月
+
+> 计划过完dp（需一天多题、跳过一些题）
+
+1. [738. Monotone Increasing Digits](https://leetcode.cn/problems/monotone-increasing-digits/)
+
+   思路就是从后往前遍历，当i - 1 > i 时，使i - 1的值减一，同时记录i的位置，之后要将这位置设置为最大的9
+
+   [968. Binary Tree Cameras](https://leetcode.cn/problems/binary-tree-cameras/)
+
+   运用的是回溯法，按照后续遍历的方式，且根据各种状态来安排，只有当根节点无覆盖、左右有无覆盖时，就要➕摄像头
+
+   ### 动态规划
+
+2. [70. Climbing Stairs](https://leetcode.cn/problems/climbing-stairs/)
+
+   没想到之前是不知道dp怎么写的，但想出来就发现就跟斐波那契数列一样
+
+   [746. Min Cost Climbing Stairs](https://leetcode.cn/problems/min-cost-climbing-stairs/)
+
+   定义了dp数组，dp[i]的定义：到达第i台阶所花费的最少体力为dp[i]。我的初始化是算了cost的，而不是从0开始，故最后返回值是选取最后一个和最后两个里最小的那一个
+
+   [62. Unique Paths](https://leetcode.cn/problems/unique-paths/)
+
+   自己写对了90%，但是在递推公式中的用的是+，而不是取max，这导致了错误
+
+   [63. Unique Paths II](https://leetcode.cn/problems/unique-paths-ii/)
+
+   运用了很多重if判断及使用原数组的方式来实现的，达到了空间复杂度的最低，而且效率也很高
+
+3. [343. Integer Break](https://leetcode.cn/problems/integer-break/)
+
+   我自己只想到了一层遍历，但实际上是需要用到二层遍历的。dp数组我都想出来了，就是在一层遍历下的递推公式想不出
+
+   参考carl的更高效版
+
+   [96. Unique Binary Search Trees](https://leetcode.cn/problems/unique-binary-search-trees/)
+
+   依旧是没发现是二次循环，而且很像牛顿二项式
+
+   01背包：[卡码网第46题](https://kamacoder.com/problempage.php?pid=1046)
+
+   方法一：用二维数组的方式**dp\[i]\[j] 表示从下标为[0-i]的物品里任意取，放进容量为j的背包，价值总和最大是多少**。
+
+   方法二：用滚动一维数组，但对于j的遍历必须是从后往前的。二维数组的j是从1开始，一维就是从bagWeight开始。同时，去掉了一维，递推式就不用再写[i]或[i-1]这一层次了
+
+4. 1
+
+5. 1
+
+6. 1
+
+7. 1
+
+8.  
+
+9.  
+
+10.  
+
+11.  
+
+12.  
+
+13.  
+
+14.  
+
+15.  
+
+16.  
+
+17.  
+
+18.  
+
+19.   
+
+20.  
+
+21.  
+
+22.  
+
+23.  
+
+24.  
+
+25.  
+
+26.  
+
+    
 
 
 
