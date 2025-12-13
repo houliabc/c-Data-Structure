@@ -4,11 +4,11 @@
 
 typedef int ElemType;
 typedef struct{
-	ElemType data[MaxSize];  //elemtype¶¼ÓÃintÌæ´ú
+	ElemType data[MaxSize];  //elemtypeéƒ½ç”¨intæ›¿ä»£
 	int length;
-}Sqlist;  //ÕâÀïÔÚstructºóÃæÕâÑùĞ´ÁËËùÒÔ¾ÍÊÇ½á¹¹ÌåÖ¸ÕëÀàĞÍ£¬ËùÒÔÒªÓÃÖ¸Õë£¿
+}Sqlist;  
 
-//1.½¨Á¢Ë³Ğò±í
+//1.å»ºç«‹é¡ºåºè¡¨
 void Create(Sqlist * &L,ElemType a[],int n){
 	int i=0;
 	L=(Sqlist *)malloc(sizeof(Sqlist));
@@ -19,38 +19,38 @@ void Create(Sqlist * &L,ElemType a[],int n){
 	L->length=i;
 }
 
-//2.Ë³Ğò±í»ù±¾ÔËËãËã·¨
-//1.³õÊ¼»¯Ë³Ğò±í
+//2.é¡ºåºè¡¨åŸºæœ¬è¿ç®—ç®—æ³•
+//1.åˆå§‹åŒ–é¡ºåºè¡¨
 void initlist(Sqlist *& L){
 	L=(Sqlist *)malloc(sizeof(Sqlist));
 	L->length=0;
 }
-//2.Ïú»ÙË³Ğò±í
+//2.é”€æ¯é¡ºåºè¡¨
 void destroylist(Sqlist *&L){
 	free(L);
 }
-//3.ÅĞ¶ÏË³Ğò±íÊÇ·ñÎª¿Õ±í
+//3.åˆ¤æ–­é¡ºåºè¡¨æ˜¯å¦ä¸ºç©ºè¡¨
 bool listempty(Sqlist *L){
 	return(L->length==0);
 }
-//4.ÇóË³Ğò±íµÄ³¤¶È
+//4.æ±‚é¡ºåºè¡¨çš„é•¿åº¦
 int listlength(Sqlist *L){
 	return(L->length);
 }
-//5.Êä³öË³Ğò±í
+//5.è¾“å‡ºé¡ºåºè¡¨
 void displist(Sqlist * L){
 	for(int i=0;i<L->length;i++)
 		printf("%d,",L->data[i]);
 	printf("\n");
 }
-//6.ÇóË³Ğò±íÖĞ¶ÔÓ¦Î»ÖÃµÄÔªËØÖµ
+//6.æ±‚é¡ºåºè¡¨ä¸­å¯¹åº”ä½ç½®çš„å…ƒç´ å€¼
 bool getelem(Sqlist *L,int i,ElemType &e){
 	if(i<1 || i>L->length)
 		return false;
 	e=L->data[i-1];
 	return true;
 }
-//7.°´ÔªËØÖµ²éÕÒÎ»ÖÃ
+//7.æŒ‰å…ƒç´ å€¼æŸ¥æ‰¾ä½ç½®
 int locateelem(Sqlist *L,ElemType e){
 	int i=0;
 	while(i<L->length && L->length!=e)
@@ -60,7 +60,7 @@ int locateelem(Sqlist *L,ElemType e){
 	else
 		return i+1;
 }
-//8.°´Î»ÖÃÇ°²åÈëÊı¾İÔªËØ
+//8.æŒ‰ä½ç½®å‰æ’å…¥æ•°æ®å…ƒç´ 
 bool listinsert(Sqlist * &L,int i,ElemType e){
 	int j;
 	if(i<1 || i>L->length)
@@ -72,7 +72,7 @@ bool listinsert(Sqlist * &L,int i,ElemType e){
 	L->length++;
 	return true;
 }
-//9.É¾³ıµÚi¸öÊı¾İÔªËØ
+//9.åˆ é™¤ç¬¬iä¸ªæ•°æ®å…ƒç´ 
 bool listdelete(Sqlist * &L,int i,ElemType &e){
 	int j;
 	if(i<1 || i>L->length)
@@ -85,9 +85,9 @@ bool listdelete(Sqlist * &L,int i,ElemType &e){
 	return true;
 }
 
-//3.Ë³Ğò±íµÄÓ¦ÓÃ
-//1.É¾³ıËùÓĞÖµµÈÓÚxµÄÔªËØ£¬Ê±¼ä¸´ÔÓ¶ÈÎªOn¡¢¿Õ¼ä¸´ÔÓ¶ÈÎªO1\
-//ÎÒ×Ô¼ºĞ´µÄ´íÎó°æ±¾
+//3.é¡ºåºè¡¨çš„åº”ç”¨
+//1.åˆ é™¤æ‰€æœ‰å€¼ç­‰äºxçš„å…ƒç´ ï¼Œæ—¶é—´å¤æ‚åº¦ä¸ºOnã€ç©ºé—´å¤æ‚åº¦ä¸ºO1\
+//æˆ‘è‡ªå·±å†™çš„é”™è¯¯ç‰ˆæœ¬
 void listdeleteall(Sqlist * &L,ElemType x){
 	int i=0;
 	while(i<L->length){
@@ -101,7 +101,7 @@ void listdeleteall(Sqlist * &L,ElemType x){
 			i++;
 	}
 }
-//´ğ°¸°æ±¾
+//ç­”æ¡ˆç‰ˆæœ¬
 void listdeleteall2(Sqlist *&L,ElemType x){
 	int k=0,i;
 	for(i=0;i<L->length;i++){
@@ -110,9 +110,9 @@ void listdeleteall2(Sqlist *&L,ElemType x){
 			k++;
 		}
 	}
-	L->length=k;  //kÎª²»µÈÓÚxµÄ¸öÊı£¬½«²»µÈÓÚxµÄÊı¾İÍùÇ°·Å£¬¸²¸Çµô£¬×îºóÉèÖÃ±í³¤£¬¾ÍºóÃæµÄÔªËØÈÓµô
+	L->length=k;  //kä¸ºä¸ç­‰äºxçš„ä¸ªæ•°ï¼Œå°†ä¸ç­‰äºxçš„æ•°æ®å¾€å‰æ”¾ï¼Œè¦†ç›–æ‰ï¼Œæœ€åè®¾ç½®è¡¨é•¿ï¼Œå°±åé¢çš„å…ƒç´ æ‰”æ‰
 }
-//2.Éè¼ÆÒ»¸ö¾¡¿ÉÄÜ¸ßĞ§µÄËã·¨£¬Ê¹µÚÒ»¸öÔªËØÎª·Ö½çÏß£¬Ğ¡ÓÚµÄ·Å×ó±ß£¬´óÓÚµÄ·ÅÓÒ±ß
+//2.è®¾è®¡ä¸€ä¸ªå°½å¯èƒ½é«˜æ•ˆçš„ç®—æ³•ï¼Œä½¿ç¬¬ä¸€ä¸ªå…ƒç´ ä¸ºåˆ†ç•Œçº¿ï¼Œå°äºçš„æ”¾å·¦è¾¹ï¼Œå¤§äºçš„æ”¾å³è¾¹
 void boundaryList(Sqlist *&L){
 	ElemType x=L->data[0];
 }
@@ -123,8 +123,8 @@ int main(){
 	Sqlist *L;
 	initlist(L);
 	Create(L,a1,sizeof(a1)/sizeof(a1[0]));
-	printf("ÊÇ·ñÎª¿Õ±í£º%d\n",listempty(L));
-	printf("±íµÄ³¤¶È£º%d\n",listlength(L));
+	printf("æ˜¯å¦ä¸ºç©ºè¡¨ï¼š%d\n",listempty(L));
+	printf("è¡¨çš„é•¿åº¦ï¼š%d\n",listlength(L));
 	displist(L);
 	
 	listinsert(L,4,999);
@@ -134,7 +134,7 @@ int main(){
 	displist(L);
 	
 	destroylist(L);
-	printf("´İ»ÙÊı¾İºóÃ»ÓĞfreeÔò»¹»áÓĞºÜ¶àÔàÊı¾İ\n");
-	displist(L);//´İ»ÙÊı¾İºóÃ»ÓĞfreeÔò»¹»áÓĞºÜ¶àÔàÊı¾İ
+	printf("æ‘§æ¯æ•°æ®åæ²¡æœ‰freeåˆ™è¿˜ä¼šæœ‰å¾ˆå¤šè„æ•°æ®\n");
+	displist(L);//æ‘§æ¯æ•°æ®åæ²¡æœ‰freeåˆ™è¿˜ä¼šæœ‰å¾ˆå¤šè„æ•°æ®
 	return 0;
 }

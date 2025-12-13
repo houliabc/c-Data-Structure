@@ -1396,7 +1396,7 @@ private:
 
 递归函数什么时候需要返回值？什么时候不需要返回值？这里总结如下三点：
 
-- 如果需要**搜索整棵二叉树且不用处理递归返回值，递归函数就不要返回值**。（这种情况就是本文下半部分介绍的[113.路径总和ii](https://leetcode.cn/problems/path-sum-ii/description/)）
+- 如果需要**搜索整棵二叉树且不用处理递归返回值，递归函数就不要返回值**。（这种情况就是本文下半部分介绍的[113.路径总和ii](https://leetcode.cn/problems/path-sum-ii/description/)）——**排列个数、组合个数**
 - 如果需要**搜索整棵二叉树且需要处理递归返回值，递归函数就需要返回值**。 （这种情况我们在[236. 二叉树的最近公共祖先 (opens new window)](https://programmercarl.com/0236.二叉树的最近公共祖先.html)中介绍）
 - 如果要**搜索其中一条符合条件的路径，那么递归一定需要返回值，因为遇到符合条件的路径了就要及时返回**。（本题的情况：[112. Path Sum](https://leetcode.cn/problems/path-sum/)）
 
@@ -1450,6 +1450,354 @@ private:
 除此以外其他类型的背包，面试几乎不会问，都是竞赛级别的了，leetcode上连多重背包的题目都没有，所以题库也告诉我们，01背包和完全背包就够用了。
 
 而完全背包又是也是01背包稍作变化而来，即：完全背包的物品数量是无限的。
+
+### 背包问题的具体化求解过程
+
+总结得出，对**求最大个数时，dp[0]初始化为1，用max，且递推式里用+1；求总和时用+=；求价值时用+value[i]。求最小个数时，初始化为INT_MAX，用min，且递推式里用+1**
+
+### 01背包
+
+https://kamacoder.com/problempage.php?pid=1046
+
+1. 二维dp数组
+
+   01背包中二维dp数组的**两个for遍历的先后循序是可以颠倒的**
+
+   ```cpp
+   #include <algorithm>
+   #include <iostream>
+   #include <vector>
+   using namespace std;
+    
+   int main() {
+     int n, bagWeight;
+     cin >> n >> bagWeight;
+     vector<int> weight(n), value(n);
+     for (int i = 0; i < n; i++) {
+       cin >> weight[i];
+     }
+     for (int i = 0; i < n; i++) {
+       cin >> value[i];
+     }
+     // dp[i][j] 表示背包重量为j时，必须选取物品i时所能达到的最大价值
+     vector<vector<int>> dp(n, vector<int>(bagWeight + 1));
+     // 6 1
+     // 2 2 3 1 5 2
+     // 2 3 1 5 4 3
+     //     0   1
+     // w1  0   0
+     // w2  0   0
+     // w3  0   0
+     // w4  0   0
+     // w5  0   5
+     // w6  0   0
+     // 初始化dp表，其中第0列都应该设为0（重量0）
+     for (int i = 0; i < n; i++) {
+       dp[i][0] = 0;
+     }
+     // 第一行应该是第一个物品的按照背包容量能否拿到价值
+     for (int j = 1; j <= bagWeight; j++) {
+       if (weight[0] <= j)
+         dp[0][j] = value[0];
+     }
+    
+     // 先选取合适的空间
+     // i 为第i个物品
+     for (int i = 1; i < n; i++) {
+       // 从前往后遍历
+       // j为背包空间
+       for (int j = 0; j <= bagWeight; j++) {
+         // 如果当前背包容纳不下第i个物品，则价值用上一个i-1物品的最大价值
+         if (weight[i] > j)
+           dp[i][j] = dp[i - 1][j];
+         // 如果容纳的了，就看是否能容纳两个
+         else
+           dp[i][j] = max(dp[i - 1][j], dp[i - 1][j - weight[i]] + value[i]);
+       }
+     }
+     cout << dp[n - 1][bagWeight];
+     return 0;
+   }
+   ```
+
+2. 一维滚动数组
+
+   **01背包下的一维dp数组**的两个for循环先后循序**一定是先遍历物品，再遍历背包容量**。
+
+   **01 背包要求 “每个物品只能选 1 次”，所以必须用逆序遍历**
+
+   ```cpp
+   #include <algorithm>
+   #include <iostream>
+   #include <vector>
+   using namespace std;
+    
+   int main() {
+     int n, bagWeight;
+     cin >> n >> bagWeight;
+     vector<int> weight(n), value(n);
+     for (int i = 0; i < n; i++) {
+       cin >> weight[i];
+     }
+     for (int i = 0; i < n; i++) {
+       cin >> value[i];
+     }
+     // 用一维滚动数组来代替二维的dp表。dp[j] 表示容量为j的背包，价值总和最大是多少。
+     vector<int> dp(bagWeight + 1, 0);
+    
+     // 先选取合适的空间
+     // i 为第i个物品
+     for (int i = 0; i < n; i++) {
+       // j为背包空间
+       // 用一维dp表只能后续遍历背包打造
+       for (int j = bagWeight; j >= weight[i]; j--) {
+           // 只需去掉[i]这一维度即可
+           dp[j] = max(dp[j], dp[j - weight[i]] + value[i]);
+       }
+     }
+     cout << dp[bagWeight];
+     return 0;
+   }
+   ```
+
+
+### 完全背包
+
+https://kamacoder.com/problempage.php?pid=1052
+
+**相比于01背包，只改动了初始化和dp递推式**
+
+1. 二维dp表
+
+   ```cpp
+   #include <algorithm>
+   #include <iostream>
+   #include <vector>
+   using namespace std;
+    
+   int main() {
+     int n, bagWeight;
+     cin >> n >> bagWeight;
+     vector<int> weight(n), value(n);
+     for (int i = 0; i < n; i++) {
+       cin >> weight[i];
+       cin >> value[i];
+     }
+     // dp[i][j] 表示背包重量为j时，必须选取物品i时所能达到的最大价值
+     vector<vector<int>> dp(n, vector<int>(bagWeight + 1, 0));
+     // 4 5
+     // weight: 1 2 3 4
+     // value:  2 4 4 5 
+     //     0   1  2   3   4   5
+     // w1  0   2  4   6   8   10
+     // w2  0   2  4   6   8   10
+     // w3  0   2
+     // w4  0   2
+     // 初始化dp表，其中第一行应该是第一个物品的按照背包容量能否拿到价值
+     // 相比于01背包，只改动了初始化和dp递推式
+     for (int j = weight[0]; j <= bagWeight; j++) {
+       dp[0][j] = dp[0][j - weight[0]] + value[0];
+     }
+    
+     // 先选取合适的空间
+     // i 为第i个物品
+     for (int i = 1; i < n; i++) {
+       // 从前往后遍历
+       // j为背包空间
+       for (int j = 0; j <= bagWeight; j++) {
+         // 如果当前背包容纳不下第i个物品，则价值用上一个i-1物品的最大价值
+         if (weight[i] > j)
+           dp[i][j] = dp[i - 1][j];
+         // 如果容纳的了，就看是否能容纳两个
+         else
+           // 相比于01背包，只改动了初始化和dp递推式
+           dp[i][j] = max(dp[i - 1][j], dp[i][j - weight[i]] + value[i]);
+       }
+     }
+     cout << dp[n - 1][bagWeight];
+     return 0;
+   }
+   ```
+
+2. 一维dp数组
+
+   **在完全背包中，对于一维dp数组来说，两个循环都是正序遍历（每个物品可以选无限次，所以可以正序），而且本题中的两层for循环顺序是无所谓的**！
+
+   但在求排列和组合的情况下，就不能颠倒顺序了：
+
+   **如果求组合数就是外层for循环遍历物品，内层for遍历背包**。
+
+   **如果求排列数就是外层for遍历背包，内层for循环遍历物品**。
+
+   1. 先遍历物品（组合）：
+   
+      ```cpp
+      #include <algorithm>
+      #include <iostream>
+      #include <vector>
+      using namespace std;
+       
+      int main() {
+        int n, bagWeight;
+        cin >> n >> bagWeight;
+        vector<int> weight(n), value(n);
+        for (int i = 0; i < n; i++) {
+          cin >> weight[i];
+          cin >> value[i];
+        }
+        // 一维滚动dp数组实现——初始化为0即可
+        vector<int> dp(bagWeight + 1, 0);
+      
+        // 先遍历物品
+        for (int i = 0; i < n; i++) {
+          // 再遍历背包
+          for (int j = 0; j <= bagWeight; j++) {
+            if (j - weight[i] >= 0)
+              dp[j] = max(dp[j], dp[j - weight[i]] + value[i]);
+          }
+        }
+        cout << dp[bagWeight];
+        return 0;
+      }
+      ```
+   
+   2. 先遍历背包（排列）：
+   
+      ```cpp
+      for (int j = 0; j <= bagWeight; j++) {
+          for (int i = 0; i < weight.size(); i++) {
+              if (j - weight[i] >= 0)
+                  dp[j] = max(dp[j], dp[j - weight[i]] + value[i]);
+          }
+      }
+      ```
+   
+
+### 多重背包
+
+该背包面试基本不考，但也需练习。本质是将m件物品摊开，化为m行的01背包中的一个物品，接着按照01背包思路即可——选与不选
+
+![image-20251211155037836](https://houlir2.dpdns.org/2025/12/5fe814c4ff95067911e3a082800a4c8e.png)
+
+https://kamacoder.com/problempage.php?pid=1066
+
+- 自己写+gpt更正——三重遍历的01背包 + 一个遍历个数：
+
+```cpp
+#include <iostream>
+#include <vector>
+#include <algorithm> 
+using namespace std;
+
+int main() {
+    int bagSize = 0, n;
+    cin >> bagSize >> n;
+    vector<int> weight(n), value(n), count(n);
+    // n个矿石的重量
+    for (int i = 0; i < n; i++) {
+        cin >> weight[i];
+    }
+    // n个矿石的价值
+    for (int i = 0; i < n; i++) {
+        cin >> value[i];
+    }
+    // n个矿石的可用数量上限
+    for (int i = 0; i < n; i++) {
+        cin >> count[i];
+    }
+
+    vector<vector<int>> dp(n, vector<int>(bagSize + 1, 0));
+
+    // 初始化第一行
+    for (int j = 1; j <= bagSize; j++) { // 从j=1开始，而非weight[0]，避免漏算
+        // 核心：计算当前容量j下，物品0最多能装多少个（重量+数量双重限制）
+        int max_num = min(count[0], j / weight[0]);
+        dp[0][j] = max_num * value[0]; // 按实际可装数量计算价值
+    }
+
+    // 开始递推dp数组
+    for (int i = 1; i < n; i++) {
+        for (int j = 1; j <= bagSize; j++) {
+            // 初始值为“不选当前物品i”的最优解 
+            dp[i][j] = dp[i - 1][j];
+
+            // 遍历当前物品i的可选数量k（1~count[i]），限制数量
+            for (int k = 1; k <= count[i]; k++) {
+                // 重量足够装k个物品i时，才计算价值
+                if (j >= k * weight[i]) {
+                    // 选k个物品i的价值 = 剩余容量的最优解 + k*价值
+                    dp[i][j] = max(dp[i][j], dp[i-1][j - k*weight[i]] + k*value[i]);
+                } else {
+                    break; // 重量不够，无需尝试更多数量
+                }
+            }
+        }
+    }
+
+    cout << dp[n - 1][bagSize];
+    return 0;
+}
+```
+
+### 背包递推公式
+
+问能否能装满背包（或者最多装多少）：dp[j] = max(dp[j], dp[j - nums[i]] + nums[i]); ，对应题目如下：
+
+- [动态规划：416.分割等和子集(opens new window)](https://programmercarl.com/0416.分割等和子集.html)
+- [动态规划：1049.最后一块石头的重量 II(opens new window)](https://programmercarl.com/1049.最后一块石头的重量II.html)
+
+问装满背包有几种方法：dp[j] += dp[j - nums[i]] ，对应题目如下：
+
+- [动态规划：494.目标和(opens new window)](https://programmercarl.com/0494.目标和.html)
+- [动态规划：518. 零钱兑换 II(opens new window)](https://programmercarl.com/0518.零钱兑换II.html)
+- [动态规划：377.组合总和Ⅳ(opens new window)](https://programmercarl.com/0377.组合总和Ⅳ.html)
+- [动态规划：70. 爬楼梯进阶版（完全背包）(opens new window)](https://programmercarl.com/0070.爬楼梯完全背包版本.html)
+
+问背包装满最大价值：dp[j] = max(dp[j], dp[j - weight[i]] + value[i]); ，对应题目如下：
+
+- [动态规划：474.一和零(opens new window)](https://programmercarl.com/0474.一和零.html)
+
+问装满背包所有物品的最小个数：dp[j] = min(dp[j - coins[i]] + 1, dp[j]); ，对应题目如下：
+
+- [动态规划：322.零钱兑换(opens new window)](https://programmercarl.com/0322.零钱兑换.html)
+- [动态规划：279.完全平方数(opens new window)](https://programmercarl.com/0279.完全平方数.html)
+
+### [遍历顺序](https://programmercarl.com/背包总结篇.html#遍历顺序)
+
+#### 01背包
+
+在[动态规划：关于01背包问题，你该了解这些！ (opens new window)](https://programmercarl.com/背包理论基础01背包-1.html)中我们讲解二维dp数组01背包先遍历物品还是先遍历背包都是可以的，且第二层for循环是从小到大遍历。
+
+和[动态规划：关于01背包问题，你该了解这些！（滚动数组） (opens new window)](https://programmercarl.com/背包理论基础01背包-2.html)中，我们讲解一维dp数组01背包只能先遍历物品再遍历背包容量，且第二层for循环是从大到小遍历。
+
+**一维dp数组的背包在遍历顺序上和二维dp数组实现的01背包其实是有很大差异的，大家需要注意！**
+
+#### [完全背包](https://programmercarl.com/背包总结篇.html#完全背包)
+
+说完01背包，再看看完全背包。
+
+在[动态规划：关于完全背包，你该了解这些！ (opens new window)](https://programmercarl.com/背包问题理论基础完全背包.html)中，讲解了纯完全背包的一维dp数组实现，先遍历物品还是先遍历背包都是可以的，且第二层for循环是从小到大遍历。
+
+但是仅仅是纯完全背包的遍历顺序是这样的，题目稍有变化，两个for循环的先后顺序就不一样了。
+
+**如果求组合数就是外层for循环遍历物品，内层for遍历背包**。
+
+**如果求排列数就是外层for遍历背包，内层for循环遍历物品**。
+
+相关题目如下：
+
+- 求组合数：[动态规划：518.零钱兑换II(opens new window)](https://programmercarl.com/0518.零钱兑换II.html)
+- 求排列数：[动态规划：377. 组合总和 Ⅳ (opens new window)](https://mp.weixin.qq.com/s/Iixw0nahJWQgbqVNk8k6gA)、[动态规划：70. 爬楼梯进阶版（完全背包）(opens new window)](https://programmercarl.com/0070.爬楼梯完全背包版本.html)
+
+如果求最小数，那么两层for循环的先后顺序就无所谓了，相关题目如下：
+
+- 求最小数：[动态规划：322. 零钱兑换 (opens new window)](https://programmercarl.com/0322.零钱兑换.html)、[动态规划：279.完全平方数(opens new window)](https://programmercarl.com/0279.完全平方数.html)
+
+**对于背包问题，其实递推公式算是容易的，难是难在遍历顺序上，如果把遍历顺序搞透，才算是真正理解了**。
+
+### 背包问题总结
+
+![img](https://houlir2.dpdns.org/2025/12/f031cff7929672e8e978231430bbc0f0.jpeg)
 
 # C++ 标准库
 

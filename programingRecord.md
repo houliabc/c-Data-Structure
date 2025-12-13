@@ -1425,53 +1425,121 @@ def backtrack(路径, 选择列表):
 
    方法二：用滚动一维数组，但对于j的遍历必须是从后往前的。二维数组的j是从1开始，一维就是从bagWeight开始。同时，去掉了一维，递推式就不用再写[i]或[i-1]这一层次了
 
-4. 1
+4. [416. Partition Equal Subset Sum](https://leetcode.cn/problems/partition-equal-subset-sum/)
 
-5. 1
+   本题的本质是，能否把容量为 sum / 2的背包装满。dp[j] 表示： 容量（所能装的重量）为j的背包，所背的物品价值最大可以为dp[j]。
 
-6. 1
+   将此大问题可以分解为一个小问题，即能否找到一个子数组的大小是 == 其大数组的一半大小的，这样不就决定了另一个数组也是同样的大小了的吗————先试试暴力的回溯算法——可行的，但是超时了，故要用一个更加高效的算法来解决此题目
 
-7. 1
+   [1049. Last Stone Weight II](https://leetcode.cn/problems/last-stone-weight-ii/)
 
-8.  
+   关键在于理解将两个小石块相碰撞 == 两组小石块集合去碰撞，也就是求背包容量为 sum/2的背包能装下的最大重量
 
-9.  
+   和昨天讲解的 416. 分割等和子集 (opens new window)非常像了，简直就是同一道题。
 
-10.  
+   [494. Target Sum](https://leetcode.cn/problems/target-sum/)
 
-11.  
+   回溯法：大体是正确的，本用了int 做return，但实际上是错误的，应该是在外面定义一个count用于统计。而且要判断当前是否是n个数
 
-12.  
+   本体没法直接用01背包来做，需将问题做相应的转换。dp算法特别是背包算法的难点在于你如何将问题转变成dp问题，往往需要找到对应的关系式或者推出是符合dp的
 
-13.  
+5. 无
 
-14.  
+6. 无
 
-15.  
+7. 复习01背包
 
-16.  
+8. [474. Ones and Zeroes](https://leetcode.cn/problems/ones-and-zeroes/)
 
-17.  
+   有点困难，难以理解，抄的题解。dp[i][j]：最多有i个0和j个1的strs的最大子集的大小为dp[i][j]。
 
-18.  
+9. https://kamacoder.com/problempage.php?pid=1052
 
-19.   
+   开始了完全背包的练习：其中包括二维和一维两种实现方式
 
-20.  
+   [518. Coin Change II](https://leetcode.cn/problems/coin-change-ii/)
 
-21.  
+   针对这种统计“个数”的问题，我们是用到“+”来实现的，而非原本的max，也就是根据上一层的同一amount的最大个数➕本层的去掉本层重量的对应重量下的最大个数
 
-22.  
+   用滚动一维数组来实现本体，需要注意的是，这里的j循环并非从后遍历了
 
-23.  
+10. [377. Combination Sum IV](https://leetcode.cn/problems/combination-sum-iv/)
 
-24.  
+    针对排列问题，用一维数组来实现的方式就需要先遍历背包，再遍历物品。本题是统计组合的个数，而如果是将所有组合可能列出，就只能用回溯算法了
 
-25.  
+    [322. Coin Change](https://leetcode.cn/problems/coin-change/)
 
-26.  
+    本题依旧是完全背包，不过不同的点在于初始化和求的内容是不同的，之前往往都是所达到的最大价值，而这题是所达到的最少个数。——总结得出，对求最大个数时，初始化为0，用max，且递推式里用+1；求总和时用+=；求价值时用+value[i]。求最小个数时，初始化为INT_MAX，用min，且递推式里用+1
 
-    
+    [279. Perfect Squares](https://leetcode.cn/problems/perfect-squares/)
+
+    本题和322解法相同：dp[j]表示达到j这个数字（背包容量），最少的数字个数是多少，应该初始化为INT_MAX
+
+    [139. Word Break](https://leetcode.cn/problems/word-break/)
+
+    自己写的回溯算法，遗憾的是超时了
+
+    gpt优化过后的回溯算法，用到了一个记忆的状态数组
+
+    dp[i] 表示：字符串 s 的前 i 个字符组成的子串（即 s[0..i-1]，下标从 0 开始），是否能被拆分成 wordDict 中的若干个单词。
+
+11. https://kamacoder.com/problempage.php?pid=1066
+
+    自己写+gpt更正——三重遍历的01背包 + 一个遍历个数
+
+    [198. House Robber](https://leetcode.cn/problems/house-robber/)
+
+    居然自己根据dp算法写出来了，证明我的dp能力有了一定的提高了：其实也可以看出是要根据每一个地方的状态去推出最优解的。个数>2时，可以是选择前者或者是前前者加上当前的，个数<=2时相当于是初始化的操作
+
+    [213. House Robber II](https://leetcode.cn/problems/house-robber-ii/)
+
+    对于这种对原始问题加了条件的题目，你如果没有读懂题目或者说没有将题目所描述的内容转换成各种情况的分类讨论的话，那你是写不出来的。必须掌握这种分类讨论的思想，不管是在数学还是在计算机当中。
+
+12. [337. House Robber III](https://leetcode.cn/problems/house-robber-iii/)
+
+    方法一：直接暴力的递归后续遍历来解决（发现自己忘记了如何写树的遍历了，不管是递归还是迭代，之后的数据结构得练习了）
+
+    方法二：在树形结构中同时运用递归和dp算法
+
+    [121. Best Time to Buy and Sell Stock](https://leetcode.cn/problems/best-time-to-buy-and-sell-stock/)
+
+    和carl的dp有点不太一样，就像是用了dp数组而实现的贪心或者是在贪心上强行用dp数组：dp[i][0]表示第i天的买入的最低价格，dp[i][1]表示第i天卖出的最高价格
+
+    [123. Best Time to Buy and Sell Stock III](https://leetcode.cn/problems/best-time-to-buy-and-sell-stock-iii/)
+
+    设置五种状态的dp写法
+
+    用滚动数组的写法：节省空间
+
+13. 
+
+14. 
+
+15. 
+
+16. 
+
+17. 
+
+18. 
+
+19. 
+
+20. 
+
+21. 
+
+22. 
+
+23. 
+
+24. 
+
+25. 
+
+26. 
+
+​    
 
 
 
