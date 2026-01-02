@@ -1799,6 +1799,405 @@ int main() {
 
 ![img](https://houlir2.dpdns.org/2025/12/f031cff7929672e8e978231430bbc0f0.jpeg)
 
+# 单调栈
+
+利用单调栈来做可以达到线性的复杂度，本质是用栈的开销了优化时间上的性能
+
+比如求右边大于当前（左边）的，那就用递增的栈即可，分为两种情况处理：1.小于等于栈顶时入栈，大于栈顶时，出栈顶元素，直到小于等于当前，同时更新res表，再入栈。
+
+# 图论
+
+## dfs
+
+### 框架
+
+```cpp
+vector<vector<int>> res; // 保存符合条件的所有路径
+vector<int> path; // 起点到终点的路径
+void dfs(参数) {
+    if (终止条件) {
+        存放结果;
+        return;
+    }
+
+    for (选择：本节点所连接的其他节点) {
+        处理节点;
+        dfs(图，选择的节点); // 递归
+        回溯，撤销处理结果
+    }
+}
+```
+
+### 最大岛屿面积
+
+```cpp
+#include <iostream>
+#include <vector>
+using namespace std;
+ 
+vector<vector<int>> direction = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
+int count;
+ 
+void dfs(vector<vector<int>>& graph, vector<vector<bool>>& visited, int row, int col) {
+    // 遍历4个方向
+    for (auto& dir : direction) {
+        int nextRow = row + dir[0];
+        int nextCol = col + dir[1];
+        if (nextRow < 0 || nextCol < 0 || nextRow >= graph.size() || nextCol >= graph[0].size())
+            continue;
+        // 递归遍历相邻陆地
+        if (!visited[nextRow][nextCol] && graph[nextRow][nextCol] == 1) {
+            visited[nextRow][nextCol] = true;
+            count++;
+            dfs(graph, visited, nextRow, nextCol);
+        }
+    }
+}
+ 
+int main() {
+    int rNum, cNum, res;
+    cin >> rNum >> cNum;
+    vector<vector<int>> graph(rNum, vector<int>(cNum, 0));
+    // 版本二：用额外的标记数组
+    vector<vector<bool>> visited(rNum, vector<bool>(cNum, false));
+    for (int i = 0; i < rNum; i++) {
+        for (int j = 0; j < cNum; j++) {
+            cin >> graph[i][j]; 
+        }
+    }
+ 
+    // 遍历整个矩阵，寻找未被访问的陆地（1）
+    for (int i = 0; i < rNum; i++) {
+        for (int j = 0; j < cNum; j++) {
+            // 遇到陆地（且未被访问），计数+1，然后通过DFS标记该岛屿所有陆地为0
+            if (!visited[i][j] && graph[i][j] == 1) {
+                count = 1;
+                // 立刻标记为访问，且dfs遍历每个连通分量的节点时，也标记上
+                visited[i][j] = true;
+                dfs(graph, visited, i, j);
+                res = max(res, count);
+            }
+        }
+    }
+ 
+    cout << res;
+    return 0;
+}
+```
+
+### 求孤岛总面积
+
+```cpp
+#include <iostream>
+#include <vector>
+using namespace std;
+int dir[4][2] = {-1, 0, 0, -1, 1, 0, 0, 1}; // 保存四个方向
+void dfs(vector<vector<int>>& grid, int x, int y) {
+    grid[x][y] = 0;
+    for (int i = 0; i < 4; i++) { // 向四个方向遍历
+        int nextx = x + dir[i][0];
+        int nexty = y + dir[i][1];
+        // 超过边界
+        if (nextx < 0 || nextx >= grid.size() || nexty < 0 || nexty >= grid[0].size()) continue;
+        // 不符合条件，不继续遍历
+        if (grid[nextx][nexty] == 0) continue;
+
+        dfs (grid, nextx, nexty);
+    }
+    return;
+}
+
+int main() {
+    int n, m;
+    cin >> n >> m;
+    vector<vector<int>> grid(n, vector<int>(m, 0));
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < m; j++) {
+            cin >> grid[i][j];
+        }
+    }
+
+    // 从左侧边，和右侧边 向中间遍历
+    for (int i = 0; i < n; i++) {
+        if (grid[i][0] == 1) dfs(grid, i, 0);
+        if (grid[i][m - 1] == 1) dfs(grid, i, m - 1);
+    }
+    // 从上边和下边 向中间遍历
+    for (int j = 0; j < m; j++) {
+        if (grid[0][j] == 1) dfs(grid, 0, j);
+        if (grid[n - 1][j] == 1) dfs(grid, n - 1, j);
+    }
+    int count = 0;
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < m; j++) {
+            if (grid[i][j] == 1) count++;
+        }
+    }
+    cout << count << endl;
+}
+```
+
+
+
+### 邻接矩阵dfs求连通分量个数
+
+https://kamacoder.com/problempage.php?pid=1171
+
+```cpp
+#include <iostream>
+#include <vector>
+using namespace std;
+
+vector<vector<int>> direction = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
+
+void dfs(vector<vector<int>>& graph, vector<vector<bool>>& visited, int row, int col) {
+    // 遍历4个方向
+    for (auto& dir : direction) {
+        int nextRow = row + dir[0];
+        int nextCol = col + dir[1];
+        if (nextRow < 0 || nextCol < 0 || nextRow >= graph.size() || nextCol >= graph[0].size())
+            continue;
+        // 递归遍历相邻陆地
+        if (!visited[nextRow][nextCol] && graph[nextRow][nextCol] == 1) {
+            visited[nextRow][nextCol] = true;
+            dfs(graph, visited, nextRow, nextCol);
+        }
+    }
+}
+
+int main() {
+    int rNum, cNum, res = 0;
+    cin >> rNum >> cNum;
+    vector<vector<int>> graph(rNum, vector<int>(cNum, 0));
+    // 版本二：用额外的标记数组
+    vector<vector<bool>> visited(rNum, vector<bool>(cNum, false));
+    for (int i = 0; i < rNum; i++) {
+        for (int j = 0; j < cNum; j++) {
+            cin >> graph[i][j]; 
+        }
+    }
+
+    // 遍历整个矩阵，寻找未被访问的陆地（1）
+    for (int i = 0; i < rNum; i++) {
+        for (int j = 0; j < cNum; j++) {
+            // 遇到陆地（且未被访问），计数+1，然后通过DFS标记该岛屿所有陆地为0
+            if (!visited[i][j] && graph[i][j] == 1) {
+                // 立刻标记为访问，且dfs遍历每个连通分量的节点时，也标记上
+                visited[i][j] = true;
+                res++;
+                dfs(graph, visited, i, j);
+            }
+        }
+    }
+
+    cout << res;
+    return 0;
+}
+```
+
+
+
+### 邻接矩阵dfs求路径
+
+```cpp
+#include <iostream>
+#include <vector>
+using namespace std;
+
+vector<vector<int>> res;
+vector<int> path;
+
+void dfs(vector<vector<int>>& graph, int now, int n) {
+    if (now == n) {
+        res.push_back(path);
+        return;
+    }
+    for (int i = 1; i <= n; i++) {
+        // 表示当前有指向，那么dfs此路径
+        if(graph[now][i] == 1) {
+            path.push_back(i);
+            dfs(graph, i, n);
+            path.pop_back();
+        }
+    }
+}
+
+int main() {
+    int vNum, eNum, row, col;
+    cin >> vNum >> eNum;
+    // 对齐位序
+    vector<vector<int>> graph(vNum + 1, vector<int>(vNum + 1, 0));
+    for (int i = 0; i < eNum; i++) {
+        cin >> row >> col;
+        graph[row][col] = 1;
+    }
+    path.push_back(1); // 无论什么路径已经是从1节点出发
+    dfs(graph, 1, vNum);
+
+    // 打印路径
+    if (res.size() == 0) {
+        cout << -1;
+        return 0;
+    }
+    for (auto& i: res) {
+        for (int j = 0; j < i.size() - 1; j++) {
+            cout << i[j] << ' ';
+        }
+        cout << i[i.size() - 1] << endl;
+    }
+    return 0;
+}
+```
+
+### 领接表dfs
+
+```cpp
+#include <iostream>
+#include <vector>
+#include <list>
+using namespace std;
+
+vector<vector<int>> res;
+vector<int> path;
+
+void dfs(vector<list<int>>& graph, int now, int n) {
+    if (now == n) {
+        res.push_back(path);
+        return;
+    }
+    for (int i : graph[now]) {
+        path.push_back(i);
+        dfs(graph, i, n);
+        path.pop_back();
+    }
+}
+
+int main() {
+    int vNum, eNum, vec, linkList;
+    cin >> vNum >> eNum;
+    // 对齐位序：用邻接表
+    vector<list<int>> graph(vNum + 1);
+    for (int i = 0; i < eNum; i++) {
+        cin >> vec >> linkList;
+        // 表示将依附于vec的节点加入链表中
+        graph[vec].push_back(linkList);
+    }
+
+    path.push_back(1); // 无论什么路径已经是从1节点出发
+    dfs(graph, 1, vNum);
+
+    // 打印路径
+    if (res.size() == 0) {
+        cout << -1;
+    }
+    for (auto& i: res) {
+        for (int j = 0; j < i.size() - 1; j++) {
+            cout << i[j] << ' ';
+        }
+        cout << i[i.size() - 1] << endl;
+    }
+    return 0;
+}
+```
+
+## bfs
+
+### 邻接矩阵岛屿问题模板
+
+```cpp
+int dir[4][2] = {0, 1, 1, 0, -1, 0, 0, -1}; // 表示四个方向
+// grid 是地图，也就是一个二维数组
+// visited标记访问过的节点，不要重复访问
+// x,y 表示开始搜索节点的下标
+void bfs(vector<vector<char>>& grid, vector<vector<bool>>& visited, int x, int y) {
+    queue<pair<int, int>> que; // 定义队列
+    que.push({x, y}); // 起始节点加入队列
+    visited[x][y] = true; // 只要加入队列，立刻标记为访问过的节点
+    while(!que.empty()) { // 开始遍历队列里的元素
+        pair<int ,int> cur = que.front(); 
+        que.pop(); // 从队列取元素
+        int curx = cur.first;
+        int cury = cur.second; // 当前节点坐标
+        for (int i = 0; i < 4; i++) { // 开始向当前节点的四个方向左右上下去遍历
+            int nextx = curx + dir[i][0];
+            int nexty = cury + dir[i][1]; // 获取周边四个方向的坐标
+            if (nextx < 0 || nextx >= grid.size() || nexty < 0 || nexty >= grid[0].size()) continue;  // 坐标越界了，直接跳过
+            if (!visited[nextx][nexty]) { // 如果节点没被访问过
+                que.push({nextx, nexty});  // 队列添加该节点为下一轮要遍历的节点
+                visited[nextx][nexty] = true; // 只要加入队列立刻标记，避免重复访问
+            }
+        }
+    }
+}
+```
+
+### bfs求连通分量个数
+
+https://kamacoder.com/problempage.php?pid=1171
+
+```cpp
+#include <iostream>
+#include <vector>
+#include <queue>
+using namespace std;
+ 
+vector<vector<int>> direction = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
+ 
+void bfs(vector<vector<int>>& graph, vector<vector<bool>>& visited, int x, int y) {
+    // bfs的队列迭代主要是在bfs算法里写的，而非主函数那
+    queue<pair<int, int>> que;
+    que.push({x, y});
+    visited[x][y] = true;   // 只要加入队列，立刻标记
+    while (!que.empty()) {
+        pair<int, int> cur = que.front();
+        que.pop();
+        int curX = cur.first, curY = cur.second;
+        for (auto& dir : direction) {
+            int nextX = curX + dir[0];
+            int nextY = curY + dir[1];
+            if (nextX < 0 || nextY < 0 || nextX >= graph.size() || nextY >= graph[0].size())
+                continue;
+            // 递归遍历相邻陆地
+            if (!visited[nextX][nextY] && graph[nextX][nextY] == 1) {
+                que.push({nextX, nextY});
+                visited[nextX][nextY] = true;
+            }
+        }
+    }
+}
+ 
+int main() {
+    int rNum, cNum, res = 0;
+    cin >> rNum >> cNum;
+    vector<vector<int>> graph(rNum, vector<int>(cNum, 0));
+    // 版本三：用额外的标记数组的bfs
+    vector<vector<bool>> visited(rNum, vector<bool>(cNum, false));
+    for (int i = 0; i < rNum; i++) {
+        for (int j = 0; j < cNum; j++) {
+            cin >> graph[i][j]; 
+        }
+    }
+ 
+    // 遍历整个矩阵，寻找未被访问的陆地（1）
+    for (int i = 0; i < rNum; i++) {
+        for (int j = 0; j < cNum; j++) {
+            // 遇到陆地（且未被访问），计数+1，然后通过bfs标记该岛屿所有陆地为0
+            if (!visited[i][j] && graph[i][j] == 1) {
+                // 立刻标记为访问，且bfs遍历每个连通分量的节点时，也标记上
+                visited[i][j] = true;
+                res++;
+                bfs(graph, visited, i, j);
+            }
+        }
+    }
+ 
+    cout << res;
+    return 0;
+}
+```
+
+
+
 # C++ 标准库
 
 ## STL 容器

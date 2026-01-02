@@ -1537,7 +1537,23 @@ def backtrack(路径, 选择列表):
 
 25. 
 
-26. 
+26.  
+
+27.  
+
+28.  
+
+29.  
+
+30.  
+
+31. [739. Daily Temperatures](https://leetcode.cn/problems/daily-temperatures/)
+
+    利用单调栈来做可以达到线性的复杂度，本质是用栈的开销了优化时间上的性能
+
+    可达路径：https://kamacoder.com/problempage.php?pid=1170
+
+    
 
 ​    
 
