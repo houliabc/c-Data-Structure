@@ -1828,6 +1828,52 @@ void dfs(参数) {
 }
 ```
 
+### dfs判断节点能到达所有节点
+
+```cpp
+#include <iostream>
+#include <vector>
+#include <list>
+using namespace std;
+ 
+// 深度遍历完cur的可以到达的节点，并标记好visited
+void dfs(vector<list<int>>& graph, vector<int>& visited, int cur) {
+    if (visited[cur])
+        return;
+    visited[cur] = 1;
+    for (auto& i : graph[cur]) {
+        dfs(graph, visited, i);
+    }
+}
+ 
+int main() {
+    int vertex, edge, s, t;
+    cin >> vertex >> edge;
+    // 领接矩阵不方面判断顶点1到其他顶点是否有路径，但是邻接表方便
+    vector<list<int>> graph(vertex + 1);
+    // 表示各个顶点能否访问到
+    vector<int> visited(vertex + 1, false);
+    for (int i = 0; i < edge; i++) {
+        cin >> s >> t;
+        // s -> t
+        graph[s].push_back(t); 
+    }
+ 
+    dfs(graph, visited, 1);
+    for (int i = 1; i <= vertex; i++) {
+        // 若有节点为0，说明该节点无法到达
+        if (!visited[i]) {
+            cout << -1 << endl;
+            return 0;
+        }
+    }
+    cout << 1 << endl;
+    return 0;
+}
+```
+
+
+
 ### 最大岛屿面积
 
 ```cpp
@@ -2193,6 +2239,85 @@ int main() {
  
     cout << res;
     return 0;
+}
+```
+
+## 并查集
+
+并查集主要有三个功能。
+
+1. 寻找根节点，函数：find(int u)，也就是判断这个节点的祖先节点是哪个
+2. 将两个节点接入到同一个集合，函数：join(int u, int v)，将两个节点连在同一个根节点上
+3. 判断两个节点是否在同一个集合，函数：isSame(int u, int v)，就是判断两个节点是不是同一个根节点
+
+### 路径压缩的并查集
+
+```cpp
+int n = 1005; // n根据题目中节点数量而定，一般比节点数量大一点就好
+vector<int> father = vector<int> (n, 0); // C++里的一种数组结构
+
+// 并查集初始化
+void init() {
+    for (int i = 0; i < n; ++i) {
+        father[i] = i;
+    }
+}
+// 并查集里寻根的过程
+int find(int u) {
+    return u == father[u] ? u : father[u] = find(father[u]); // 使用了father[u] = 就是用路径压缩
+}
+
+// 判断 u 和 v是否找到同一个根
+bool isSame(int u, int v) {
+    u = find(u);
+    v = find(v);
+    return u == v;
+}
+
+// 将v->u 这条边加入并查集：将v所指向的根指向u所指向的根，也就是后者的根指向前者的根
+void join(int u, int v) {
+    u = find(u); // 寻找u的根
+    v = find(v); // 寻找v的根
+    if (u == v) return ; // 如果发现根相同，则说明在一个集合，不用两个节点相连直接返回
+    father[v] = u;
+}
+```
+
+### 按秩合并的并查集
+
+```cpp
+int n = 1005; // n根据题目中节点数量而定，一般比节点数量大一点就好
+vector<int> father = vector<int> (n, 0); // C++里的一种数组结构
+vector<int> rank = vector<int> (n, 1); // 初始每棵树的高度都为1
+
+// 并查集初始化
+void init() {
+    for (int i = 0; i < n; ++i) {
+        father[i] = i;
+        rank[i] = 1; // 也可以不写
+    }
+}
+// 并查集里寻根的过程
+int find(int u) {
+    return u == father[u] ? u : find(father[u]);// 注意这里不做路径压缩
+}
+
+// 判断 u 和 v是否找到同一个根
+bool isSame(int u, int v) {
+    u = find(u);
+    v = find(v);
+    return u == v;
+}
+
+// 将v->u 这条边加入并查集
+void join(int u, int v) {
+    u = find(u); // 寻找u的根
+    v = find(v); // 寻找v的根
+
+    if (rank[u] <= rank[v]) father[u] = v; // rank小的树合入到rank大的树
+    else father[v] = u;
+
+    if (rank[u] == rank[v] && u != v) rank[v]++; // 如果两棵树高度相同，则v的高度+1，因为上面 if (rank[u] <= rank[v]) father[u] = v; 注意是 <=
 }
 ```
 
