@@ -2283,6 +2283,72 @@ void join(int u, int v) {
 }
 ```
 
+实战：
+
+https://kamacoder.com/problempage.php?pid=1179
+
+```cpp
+#include <iostream>
+#include <vector>
+using namespace std;
+ 
+int n;  // 节点数量
+// 并查集的集合表
+vector<int> father(101, 0);
+
+// 初始化
+void init() {
+    for (int i = 0; i < n; i++)
+        father[i] = i;  // 初始化：让其根为自己
+}
+
+// 寻根
+int find(int u) {
+    return u == father[u] ? u : father[u] = find(father[u]);  // 使用了路径压缩
+}
+
+// 判断两个u和v是否是同根
+bool isSame(int u, int v) {
+    u = find(u);
+    v = find(v);
+    return u == v;
+}
+
+// 将 v->u 这条边加入并查集
+void join(int u, int v) {
+    u = find(u);
+    v = find(v);
+    if (u == v) 
+        return;
+    father[v] = u;
+}
+ 
+int main() {
+    // 这题显然是关于并查集的应用，只需判断两个节点是否属于同一个集合即可
+    int edge, s, t, source, destination;
+    cin >> n >> edge;
+
+    // 初始化并查集
+    init();
+
+    // 将所有变加入并查集中
+    for (int i = 0; i < edge; i++) {
+        cin >> s >> t;
+        join(s, t); 
+    }
+
+    cin >> source >> destination;
+    // 判断两节点是否同根
+    if (isSame(source, destination))
+        cout << 1 << endl;
+    else
+        cout << 0 << endl;
+    return 0;
+}
+```
+
+
+
 ### 按秩合并的并查集
 
 ```cpp
@@ -2318,6 +2384,88 @@ void join(int u, int v) {
     else father[v] = u;
 
     if (rank[u] == rank[v] && u != v) rank[v]++; // 如果两棵树高度相同，则v的高度+1，因为上面 if (rank[u] <= rank[v]) father[u] = v; 注意是 <=
+}
+```
+
+
+
+## 最小生成树
+
+MST——minimum-spanning-tre
+
+### prim
+
+**prim三部曲**：
+
+1. 第一步，选距离生成树最近节点（贪心选最小）——由初始化或每轮的第三步更新的minDist数组（**记录了所有非生成树节点距离生成树的最小距离**）得到
+2. 第二步，最近节点加入生成树——若有相同，可以选择序号小的
+3. 第三步，更新非生成树节点到生成树的距离（即更新minDist数组）
+
+https://kamacoder.com/problempage.php?pid=1053
+
+```cpp
+#include<iostream>
+#include<vector>
+#include <climits>
+
+using namespace std;
+int main() {
+    int v, e;
+    int x, y, k;
+    cin >> v >> e;
+    // 填一个默认最大值，题目描述val最大为10000
+    vector<vector<int>> grid(v + 1, vector<int>(v + 1, 10001));
+    while (e--) {
+        cin >> x >> y >> k;
+        // 因为是双向图，所以两个方向都要填上
+        grid[x][y] = k;
+        grid[y][x] = k;
+
+    }
+
+    // 用于保存最小生成树的边
+    vector<int> minDist(v + 1, 10001);
+    // 用于判断某定点是否在生成树中
+    vector<bool> isInTree(v + 1, false);
+
+    // 生成n个节点的最小生成树，只需要n-1条边，也就是n-1轮循环
+    for (int i = 1; i < v; i++) {
+        // 用于标记最小边的位置（位序）
+        int cur = -1;
+        int minVal = INT_MAX;
+        // 第一步：选择最近的一条边的顶点作为起点
+        for (int j = 1; j <= v; j++) { // 从1开始，对其位序：1~v
+            //  选取最小生成树节点的条件：
+            //  （1）不在最小生成树里
+            //  （2）距离最小生成树最近的节点
+            if (!isInTree[j] && minDist[j] < minVal) {  // 由于mindist默认值是10001，比INTMAX小，故总会选择第一位序的作为起点顶点
+                cur = j;
+                minVal = minDist[j];
+            }
+        }
+        // 第二步：将这个最近节点加入生成树中
+        isInTree[cur] = true;
+
+        // 第三步：更新非生成树节点到生成树的距离
+        for (int j = 1; j <= v; j++) { 
+            //  更新非生成树节点到生成树的距离的条件：
+            //  （1）不在最小生成树里
+            //  （2）与cur相连的某节点的权值 比 该某节点距离最小生成树的距离小
+            if (!isInTree[j] && grid[cur][j] < minDist[j]) {  // 由于mindist默认值是10001，比INTMAX小，故总会选择第一位序的作为起点顶点
+                minDist[j] = grid[cur][j];
+            }
+        }
+    }
+
+    int res = 0;
+    // 只有n-1条边，且第一条边为10001，所以不能记
+    for (int i = 2; i <= v; i++) {
+        res += minDist[i];
+    }
+
+    cout << res << endl;
+
+    return 0;
 }
 ```
 
