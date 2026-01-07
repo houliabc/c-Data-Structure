@@ -2254,16 +2254,19 @@ int main() {
 
 ```cpp
 int n = 1005; // n根据题目中节点数量而定，一般比节点数量大一点就好
-vector<int> father = vector<int> (n, 0); // C++里的一种数组结构
+// 并查集标记节点关系的数组
+vector<int> father = vector<int> (n, 0); 
 
 // 并查集初始化
 void init() {
     for (int i = 0; i < n; ++i) {
+        // 初始值，每个节点的根为其自己
         father[i] = i;
     }
 }
 // 并查集里寻根的过程
 int find(int u) {
+    // 如果当前是根就返回，否则递归的去找其真正的根（深度访问到底）
     return u == father[u] ? u : father[u] = find(father[u]); // 使用了father[u] = 就是用路径压缩
 }
 
@@ -2393,7 +2396,9 @@ void join(int u, int v) {
 
 MST——minimum-spanning-tre
 
-### prim
+**最小生成树的定义本身只针对「无向连通带权图（可负值）」**
+
+### 普里姆prim
 
 **prim三部曲**：
 
@@ -2469,7 +2474,205 @@ int main() {
 }
 ```
 
+### 克鲁斯卡尔Kruscal
 
+kruscal的思路：
+
+- **边的权值排序**，因为要**优先选最小的边**加入到生成树里
+- **遍历排序后的边**
+  - 如果边首尾的两个节点在同一个集合，说明如果连上这条边图中会出现环
+  - 如果边**首尾的两个节点不在同一个集合，加入到最小生成树，并把两个节点加入同一个集合**
+
+https://kamacoder.com/problempage.php?pid=1053
+
+```cpp
+#include<iostream>
+#include<vector>
+#include <climits>
+#include <algorithm>
+using namespace std;
+
+// 用克鲁斯卡尔来求最小生成树：运用到了并查集
+// 定义边集合，包括起始、终点和边权值
+struct Edge {
+    int l, r, val;
+};
+
+// 节点数量
+int n = 10001;
+// 并查集标记节点关系的数组
+vector<int> father(n, -1);
+
+void init() {
+    for (int i = 0; i < n; i++)
+        father[i] = i;
+}
+
+int find(int u) {
+    // 如果当前是根就返回，否则递归的去找其真正的根（深度访问到底）
+    return u == father[u] ? u : father[u] = find(father[u]);
+}
+
+void join(int u, int v) {
+    u = find(u);
+    v = find(v);
+    // 表示此时已经是同一个集合了
+    if (u == v)
+        return;
+    father[v] = u;
+}
+
+bool isSame(int u, int v) {
+    u = find(u);
+    v = find(v);
+    return u == v;
+}
+
+int main() {
+    int v, e;
+    int v1, v2, val;
+    cin >> v >> e;
+    vector<Edge> edges;
+    int res = 0;
+    while (e--) {
+        cin >> v1 >> v2 >> val;
+        edges.push_back({v1, v2, val});
+    }
+
+    // 按权值对边从小到大排序
+    sort(edges.begin(), edges.end(), [](const Edge& a, const Edge& b) {
+        return a.val < b.val;
+    });
+
+    init();
+
+    // 从头开始遍历边
+    for (Edge edge: edges) {
+        int x = find(edge.l), y = find(edge.r);
+        // 不在同一个集合，则加入最小生成树，同时加入集合里
+        if (x != y) {
+            // 生成树的边的和
+            res += edge.val;
+            // 将两个节点加入同一个集合
+            join(x, y);
+        }
+    }
+    cout << res << endl;
+
+    return 0;
+}
+```
+
+## 最短路径
+
+### 迪杰斯特拉Dijkstra
+
+用于**非负权值图**求起点到某节点的最短路径
+
+**dijkstra三部曲**：
+
+1. 第一步，选源点到哪个节点近且该节点未被访问过
+2. 第二步，该最近节点被标记访问过
+3. 第三步，更新非访问节点到源点的距离（即更新minDist数组）
+
+```cpp
+#include<iostream>
+#include<vector>
+#include <climits>
+
+using namespace std;
+int main() {
+    int v, e;
+    int x, y, k;
+    cin >> v >> e;
+    // 初始化邻接矩阵，INT_MAX表示不可达
+    vector<vector<int>> grid(v + 1, vector<int>(v + 1, INT_MAX));
+    while (e--) {
+        cin >> x >> y >> k;
+        // 单向图，仅赋值x→y的距离，无需双向
+        grid[x][y] = k;
+    }
+
+    // 用于保存从起点到该节点的最短距离
+    vector<int> minDist(v + 1, INT_MAX);
+    // 初始化起始顶点，自己到自己的距离为0，从1开始进行对其
+    minDist[1] = 0;
+    // 用于判断某顶点是否访问过
+    vector<bool> visited(v + 1, false);
+
+    // 迪杰斯特拉算法：v轮循环，确定v个节点的最短路径
+    for (int i = 1; i <= v; i++) {
+        // 用于标记最小边的位置（位序）
+        int cur = -1;
+        int minVal = INT_MAX;
+        // 第一步：选择最近的一条边的顶点作为起点
+        for (int j = 1; j <= v; j++) { // 从1开始，对其位序：1~v
+            //  选取最短边的顶点条件：
+            //  （1）该顶点未被访问过
+            //  （2）距离起点是最近的节点
+            if (!visited[j] && minDist[j] < minVal) {  // 由于mindist默认值是INT_MAX，比INTMAX小，故总会选择第一位序的作为起点顶点
+                cur = j;
+                minVal = minDist[j];
+            }
+        }
+        // 若所有未访问节点都不可达，直接跳出循环（优化）
+        if (cur == -1) break;
+        // 第二步：将这个最近节点标记为访问过
+        visited[cur] = true;
+
+        // 第三步：通过cur更新其他未访问节点的最短距离（松弛操作）
+        for (int j = 1; j <= v; j++) { 
+            //  最短路径的条件：
+            //  （1）该顶点未被访问过
+            //  （2）与cur相连的某节点的权值 比 该某节点距离最小生成树的距离小
+            if (!visited[j] && grid[cur][j] != INT_MAX && grid[cur][j] + minDist[cur] < minDist[j]) {  // 由于mindist默认值是INT_MAX，比INTMAX小，故总会选择第一位序的作为起点顶点
+                minDist[j] = grid[cur][j] + minDist[cur];
+            }
+        }
+    }
+
+    if (minDist[v] == INT_MAX)
+        cout << -1 << endl;
+    else
+        cout << minDist[v] << endl;
+
+    return 0;
+}
+```
+
+### dijkstra与prim算法的区别
+
+其实代码大体不差，唯一区别在 三部曲中的 第三步： 更新minDist数组
+
+因为**prim是求 非访问节点到最小生成树的最小距离，而 dijkstra是求 非访问节点到源点的最小距离**。
+
+prim 更新 minDist数组的写法：
+
+```cpp
+for (int j = 1; j <= v; j++) {
+    if (!isInTree[j] && grid[cur][j] < minDist[j]) {
+        minDist[j] = grid[cur][j];
+    }
+}
+```
+
+因为 minDist表示 节点到最小生成树的最小距离，所以 新节点cur的加入，只需要 使用 grid[cur][j] ，grid[cur][j] 就表示 cur 加入生成树后，生成树到 节点j 的距离。
+
+dijkstra 更新 minDist数组的写法：
+
+```cpp
+for (int v = 1; v <= n; v++) {
+    if (!visited[v] && grid[cur][v] != INT_MAX && minDist[cur] + grid[cur][v] < minDist[v]) {
+        minDist[v] = minDist[cur] + grid[cur][v];
+    }
+}
+```
+
+因为 minDist表示 节点到源点的最小距离，所以 新节点 cur 的加入，需要使用 源点到cur的距离 （minDist[cur]） + cur 到 节点 v 的距离 （grid[cur][v]），才是 源点到节点v的距离。
+
+此时大家可能不禁要想 **prim算法 可以有负权值**吗？
+
+当然可以！
 
 # C++ 标准库
 
