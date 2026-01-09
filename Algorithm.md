@@ -2565,6 +2565,8 @@ int main() {
 
 ## 最短路径
 
+都是针对带权有向图而言的
+
 ### 迪杰斯特拉Dijkstra
 
 用于**非负权值图**求起点到某节点的最短路径
@@ -2574,6 +2576,8 @@ int main() {
 1. 第一步，选源点到哪个节点近且该节点未被访问过
 2. 第二步，该最近节点被标记访问过
 3. 第三步，更新非访问节点到源点的距离（即更新minDist数组）
+
+https://kamacoder.com/problempage.php?pid=1047
 
 ```cpp
 #include<iostream>
@@ -2673,6 +2677,151 @@ for (int v = 1; v <= n; v++) {
 此时大家可能不禁要想 **prim算法 可以有负权值**吗？
 
 当然可以！
+
+### 弗洛伊德Floyd
+
+一种基于 **动态规划** 的方法，用于求解任意两个顶点之间的最短路径，它适用于**带权非负有向图**。
+
+https://kamacoder.com/problempage.php?pid=1155
+
+```cpp
+#include <iostream>
+#include <vector>
+#include <list>
+using namespace std;
+
+int main() {
+    int n, m, p1, p2, val;
+    cin >> n >> m;
+
+    // 1.dp数组定义
+    vector<vector<vector<int>>> grid(n + 1, vector<vector<int>>(n + 1, vector<int>(n + 1, 10005)));  // 因为边的最大距离是10^4
+
+    // 2.dp数组初始化
+    for (int i = 0; i < m; i++) {
+        cin >> p1 >> p2 >> val;
+        // 双向图，只能把 k 赋值为 0，本题节点 0 是无意义的，节点是从1 到 n。
+        grid[p1][p2][0] = val;
+        grid[p2][p1][0] = val;
+    }
+
+    // 开始floyd：实际上就是在遍历所有可能的情况上用上了动态规划
+    for (int k = 1; k <= n; k++) {
+        for (int i = 1; i <= n; i++) {
+            for (int j = 1; j <= n; j++) {
+                // 3.dp递推公式：分两种情况：前者是节点i 到 节点j 的最短路径不经过节点k；后者是节点i 到 节点j 的最短路径经过节点k
+                // 表示从起点i到终点j的对于走k或不走k的最短路径。后者的表示[i][k]+[k][j]就表示先从i到k再从k到j，相当于中转站一般的
+                grid[i][j][k] = min(grid[i][j][k - 1], grid[i][k][k - 1] + grid[k][j][k - 1]);
+            }
+        }
+    }
+
+    // 输出结果
+    int z, start, end;
+    cin >> z;
+    while(z--) {
+        cin >> start >> end;
+        if (grid[start][end][n] == 10005)
+            cout << -1 << endl;
+        else
+            cout << grid[start][end][n] << endl;
+    }
+    return 0;
+}
+```
+
+空间优化版本：
+
+```cpp
+#include <iostream>
+#include <vector>
+#include <list>
+using namespace std;
+
+int main() {
+    int n, m, p1, p2, val;
+    cin >> n >> m;
+
+    // 1.dp数组定义
+    vector<vector<int>> grid(n + 1, vector<int>(n + 1, 10005));  // 因为边的最大距离是10^4
+
+    // 2.dp数组初始化
+    for (int i = 0; i < m; i++) {
+        cin >> p1 >> p2 >> val;
+        // 双向图，只能把 k 赋值为 0，本题节点 0 是无意义的，节点是从1 到 n。
+        grid[p1][p2] = val;
+        grid[p2][p1] = val;
+    }
+
+    // 开始floyd：实际上就是在遍历所有可能的情况上用上了动态规划
+    for (int k = 1; k <= n; k++) {
+        for (int i = 1; i <= n; i++) {
+            for (int j = 1; j <= n; j++) {
+                // 3.dp递推公式：分两种情况：前者是节点i 到 节点j 的最短路径不经过节点k；后者是节点i 到 节点j 的最短路径经过节点k
+                // 表示从起点i到终点j的对于走k或不走k的最短路径。后者的表示[i][k]+[k][j]就表示先从i到k再从k到j，相当于中转站一般的
+                grid[i][j] = min(grid[i][j], grid[i][k] + grid[k][j]);
+            }
+        }
+    }
+
+    // 输出结果
+    int z, start, end;
+    cin >> z;
+    while(z--) {
+        cin >> start >> end;
+        if (grid[start][end] == 10005)
+            cout << -1 << endl;
+        else
+            cout << grid[start][end] << endl;
+    }
+    return 0;
+}
+```
+
+### 最短路径总结
+
+四大最短路算法，分别是Dijkstra、Bellman_ford、SPFA 和 Floyd。
+
+针对这四大最短路算法，我用了七篇长文才彻底讲清楚，分别是：
+
+- dijkstra朴素版
+- dijkstra堆优化版
+- Bellman_ford
+- Bellman_ford 队列优化算法（又名SPFA）
+- bellman_ford 算法判断负权回路
+- bellman_ford之单源有限最短路
+- Floyd 算法精讲
+- 启发式搜索：A * 算法
+
+最短路算法比较复杂，而且各自有各自的应用场景，我来用一张表把讲过的最短路算法的使用场景都展现出来：
+
+![img](https://houlir2.dpdns.org/2026/01/6a48a99d558b102035f1747b9bea86e4.png)
+
+（因为A * 属于启发式搜索，和上面最短路算法并不是一类，不适合一起对比，所以没有放在一起）
+
+## 有向无环图DAG
+
+用来描述表达式，可以使相同子式只出现一次，从而节省空间
+
+### 拓扑排序AOV
+
+DAG的扩展，以顶点表示活动，是个无权图，边表示活动之间关系
+
+应用：表示软件开发项目的依赖关系，或者如makefile一般
+
+### 关键路径AOE
+
+DAG的扩展，以顶点表示事件，边表示活动，有权图。
+
+只有说最长的路径完成（关键路径）了，整个工程才能结束
+
+![image-20260109175319254](https://houlir2.dpdns.org/2026/01/dba79540992700cf12268665ca792be9.png)
+
+![image-20260109175445046](https://houlir2.dpdns.org/2026/01/db37e02a23719746e672bc54dcf28ec2.png)
+
+![image-20260109174303344](https://houlir2.dpdns.org/2026/01/3f22de2170bb926a1899f305bd1da816.png)
+
+![image-20260109174311100](https://houlir2.dpdns.org/2026/01/095456cd2b4e0f14839fbf5effc33244.png)
 
 # C++ 标准库
 
