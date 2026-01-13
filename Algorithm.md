@@ -2148,6 +2148,8 @@ int main() {
 
 ## bfs
 
+也叫做Kahn卡恩算法
+
 ### 邻接矩阵岛屿问题模板
 
 ```cpp
@@ -2286,7 +2288,7 @@ void join(int u, int v) {
 }
 ```
 
-实战：
+**实战：**
 
 https://kamacoder.com/problempage.php?pid=1179
 
@@ -2400,6 +2402,8 @@ MST——minimum-spanning-tre
 
 ### 普里姆prim
 
+**权值可以为负的，适合稠密图**
+
 **prim三部曲**：
 
 1. 第一步，选距离生成树最近节点（贪心选最小）——由初始化或每轮的第三步更新的minDist数组（**记录了所有非生成树节点距离生成树的最小距离**）得到
@@ -2422,7 +2426,7 @@ int main() {
     vector<vector<int>> grid(v + 1, vector<int>(v + 1, 10001));
     while (e--) {
         cin >> x >> y >> k;
-        // 因为是双向图，所以两个方向都要填上
+        // 因为是双向图（无向图），所以两个方向都要填上
         grid[x][y] = k;
         grid[y][x] = k;
 
@@ -2475,6 +2479,10 @@ int main() {
 ```
 
 ### 克鲁斯卡尔Kruscal
+
+**适合稀疏图，权值可以为负**
+
+> 总结下来：MST和最短路径的第一个算法都是不能带负值，但第二个算法可以。MST是无向图，最短路径一般是有向图，但无向图也可以
 
 kruscal的思路：
 
@@ -2569,7 +2577,7 @@ int main() {
 
 ### 迪杰斯特拉Dijkstra
 
-用于**非负权值图**求起点到某节点的最短路径
+用于**非负权值有向图**求起点到某节点的最短路径
 
 **dijkstra三部曲**：
 
@@ -2593,7 +2601,7 @@ int main() {
     vector<vector<int>> grid(v + 1, vector<int>(v + 1, INT_MAX));
     while (e--) {
         cin >> x >> y >> k;
-        // 单向图，仅赋值x→y的距离，无需双向
+        // 单向图（有向图），仅赋值x→y的距离，无需双向
         grid[x][y] = k;
     }
 
@@ -2700,7 +2708,7 @@ int main() {
     // 2.dp数组初始化
     for (int i = 0; i < m; i++) {
         cin >> p1 >> p2 >> val;
-        // 双向图，只能把 k 赋值为 0，本题节点 0 是无意义的，节点是从1 到 n。
+        // 双向图（无环图），只能把 k 赋值为 0，本题节点 0 是无意义的，节点是从1 到 n。
         grid[p1][p2][0] = val;
         grid[p2][p1][0] = val;
     }
@@ -2730,7 +2738,7 @@ int main() {
 }
 ```
 
-空间优化版本：
+空间优化版本（二维数组）：
 
 ```cpp
 #include <iostream>
@@ -2801,19 +2809,156 @@ int main() {
 
 ## 有向无环图DAG
 
-用来描述表达式，可以使相同子式只出现一次，从而节省空间
+**用来描述表达式，可以使相同子式（不止是子式，字母也可以）只出现一次，从而节省空间**
 
 ### 拓扑排序AOV
 
-DAG的扩展，以顶点表示活动，是个无权图，边表示活动之间关系
+DAG的扩展，以**顶点表示活动，是个无权图，边表示活动之间关系**
 
-应用：表示软件开发项目的依赖关系，或者如makefile一般
+应用：表示软件开发项目的**依赖关系**，或者如makefile、maven
+
+
+
+拓扑排序 是在图上的一种排序。
+
+概括来说，**给出一个 有向图，把这个有向图转成线性的排序 就叫拓扑排序**。
+
+同样，拓扑排序也可以**检测这个有向图 是否有环，即存在循环依赖的情况**。
+
+只要记住如下两步拓扑排序的过程，代码就容易写了：
+
+1. 找到入度为0 的节点，加入结果集
+2. 将该节点从图中移除
+
+https://kamacoder.com/problempage.php?pid=1191
+
+BFS版本：
+
+```cpp
+#include <iostream>
+#include <vector>
+#include <unordered_map>
+#include <queue>
+using namespace std;
+
+int main() {
+    int n, m, s, t;  // s->t
+    cin >> n >> m;
+    unordered_map<int, vector<int>> umap;
+    vector<int> res;
+    vector<int> inDegree(n, 0);
+    queue<int> que;
+
+    while (m--) {
+        cin >> s >> t;
+        inDegree[t]++;
+        umap[s].push_back(t);
+    }
+
+    // 初始化：将入度为0的顶点加入队列中
+    for (int i = 0; i < n; i++) {
+        if (inDegree[i] == 0)
+            que.push(i);
+    }
+
+    while (!que.empty()) {
+        int cur = que.front();
+        que.pop();
+        // 加入结果集后删除该节点
+        res.push_back(cur);
+        // 获取该节点的出度顶点表
+        vector<int> t = umap[cur];
+        if (!t.empty()) {
+            for (int i = 0; i < t.size(); i++) {
+                // 减少入度
+                inDegree[t[i]]--;
+                // 如果经过减少入度后达到入度为0后，就又成为下一个将加入结果集的顶点
+                if (inDegree[t[i]] == 0)
+                    que.push(t[i]);
+            }
+        }
+    }
+
+    // 输出结果集
+    if (res.size() != n)
+        cout << -1;
+    else {
+        for (int i = 0; i < n - 1; i++)
+            cout << res[i] << " ";
+        cout << res[n - 1];
+    }
+}
+```
+
+DFS版本：
+
+```cpp
+#include <iostream>
+#include <vector>
+#include <unordered_map>
+#include <stack>
+using namespace std;
+
+int main() {
+    int n, m, s, t;  // s->t
+    cin >> n >> m;
+    unordered_map<int, vector<int>> umap;
+    vector<int> res;
+    vector<int> inDegree(n, 0);
+    stack<int> stk;
+
+    while (m--) {
+        cin >> s >> t;
+        inDegree[t]++;
+        umap[s].push_back(t);
+    }
+
+    // 初始化：将入度为0的顶点加入队列中
+    for (int i = 0; i < n; i++) {
+        if (inDegree[i] == 0)
+            stk.push(i);
+    }
+
+    while (!stk.empty()) {
+        int cur = stk.top();
+        stk.pop();
+        // 加入结果集后删除该节点
+        res.push_back(cur);
+        // 获取该节点的出度顶点表
+        vector<int> t = umap[cur];
+        if (!t.empty()) {
+            for (int i = 0; i < t.size(); i++) {
+                // 减少入度
+                inDegree[t[i]]--;
+                // 如果经过减少入度后达到入度为0后，就又成为下一个将加入结果集的顶点
+                if (inDegree[t[i]] == 0)
+                    stk.push(t[i]);
+            }
+        }
+    }
+
+    // 输出结果集
+    if (res.size() != n)
+        cout << -1;
+    else {
+        for (int i = 0; i < n - 1; i++)
+            cout << res[i] << " ";
+        cout << res[n - 1];
+    }
+}
+```
+
+
 
 ### 关键路径AOE
 
-DAG的扩展，以顶点表示事件，边表示活动，有权图。
+DAG的扩展，以**顶点表示事件，边表示活动，有权图**。
+
+关键路径也可以检测一个图是否有环
 
 只有说最长的路径完成（关键路径）了，整个工程才能结束
+
+应用：解决「项目的时间规划与优化」问题，如软件开发管理、生产流水线、工程施工进度管理等
 
 ![image-20260109175319254](https://houlir2.dpdns.org/2026/01/dba79540992700cf12268665ca792be9.png)
 
@@ -2822,6 +2967,8 @@ DAG的扩展，以顶点表示事件，边表示活动，有权图。
 ![image-20260109174303344](https://houlir2.dpdns.org/2026/01/3f22de2170bb926a1899f305bd1da816.png)
 
 ![image-20260109174311100](https://houlir2.dpdns.org/2026/01/095456cd2b4e0f14839fbf5effc33244.png)
+
+
 
 # C++ 标准库
 
